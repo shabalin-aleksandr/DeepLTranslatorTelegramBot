@@ -10,16 +10,11 @@ public class StartCommand implements CommandInterface {
     private final UserService userService;
 
     public final static String START_MESSAGE = """
-            This bot is just a study project to try Spring Boot and Telegram API.
-
-            You can execute commands from the main menu on the left or just type these commands:\s
+            🔥Greetings🔥\s
             
-           
-           Type /start to see a welcome message
-           
-           Type /help to see this message again
-           
-           Type /mydata to see data stored about yourself
+            My name is DeepLTranslatorBot, as you may have understood from my name I am designed to translate text from one language to another.\s
+            
+            Write /help and you will find out what I can do.
             """;
 
     public StartCommand(SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {

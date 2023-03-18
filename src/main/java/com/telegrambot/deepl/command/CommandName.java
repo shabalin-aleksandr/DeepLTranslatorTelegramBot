@@ -3,7 +3,8 @@ package com.telegrambot.deepl.command;
 public enum CommandName {
     START("/start"),
     STOP("/stop"),
-    HELP("/help")
+    HELP("/help"),
+    WRONG("nocommand")
     ;
 
     private final String commandName;
