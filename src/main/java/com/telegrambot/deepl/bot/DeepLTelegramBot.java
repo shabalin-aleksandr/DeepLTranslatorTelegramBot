@@ -4,6 +4,7 @@ import com.telegrambot.deepl.command.CommandContainer;
 import com.telegrambot.deepl.config.BotConfig;
 import com.telegrambot.deepl.service.SendMessageService;
 import com.telegrambot.deepl.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static com.telegrambot.deepl.command.CommandName.WRONG;
 
+@Slf4j
 @Component
 public class DeepLTelegramBot extends TelegramLongPollingBot {
 
@@ -40,7 +42,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
         }
         catch (TelegramApiException e) {
-            e.getMessage();
+            log.error("Error occurred: " + e.getMessage());
         }
 
     }
@@ -50,12 +52,15 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText().trim();
             String username = update.getMessage().getFrom().getUserName();
+            String firstName = update.getMessage().getChat().getFirstName();
 
             if (message.startsWith(COMMAND_START)) {
                 String commandId = message.split(" ")[0].toLowerCase();
                 commandContainer.findCommand(commandId, username).execute(update);
+                log.info("Replied to user: " + firstName + "(" + username + ")");
             } else {
                 commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
+                log.info("Got a wrong message/command from user: " + firstName + "(" + username + ")");
             }
         }
     }

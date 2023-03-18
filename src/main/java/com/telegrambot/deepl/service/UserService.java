@@ -2,12 +2,14 @@ package com.telegrambot.deepl.service;
 
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.sql.Timestamp;
 
+@Slf4j
 @Component
 public class UserService {
 
@@ -28,6 +30,7 @@ public class UserService {
             userRepository.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
 
             userRepositoryInterface.save(userRepository);
+            log.info("User saved: " + userRepository);
         }
     }
 
@@ -38,5 +41,7 @@ public class UserService {
         userRepository.setChatId(chatId);
 
         userRepositoryInterface.delete(userRepository);
+        log.info("User deleted: " + userRepository);
+
     }
 }

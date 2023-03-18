@@ -1,6 +1,7 @@
 package com.telegrambot.deepl.service;
 
 import com.telegrambot.deepl.bot.DeepLTelegramBot;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,7 +10,7 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-
+@Slf4j
 @Service
 public class SendMessageService implements SendMessageServiceInterface{
 
@@ -32,7 +33,7 @@ public class SendMessageService implements SendMessageServiceInterface{
         try {
             deepLBot.execute(sendMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Error occurred: " + e.getMessage());
         }
     }
 
