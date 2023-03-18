@@ -38,7 +38,5 @@ public class UserService {
         userRepository.setChatId(chatId);
 
         userRepositoryInterface.delete(userRepository);
-        // String answer = "Your data were successfully deleted!";
     }
-
 }

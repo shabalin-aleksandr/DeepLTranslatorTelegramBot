@@ -2,7 +2,7 @@ package com.telegrambot.deepl.command;
 
 public enum CommandName {
     START("/start"),
-    STOP("/stop"),
+    DELETE("/deletemydata"),
     HELP("/help"),
     WRONG("nocommand")
     ;

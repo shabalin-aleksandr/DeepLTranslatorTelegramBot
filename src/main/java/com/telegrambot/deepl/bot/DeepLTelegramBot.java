@@ -7,8 +7,13 @@ import com.telegrambot.deepl.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.telegrambot.deepl.command.CommandName.WRONG;
@@ -25,6 +30,19 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     public DeepLTelegramBot(UserService userService, BotConfig config, List<String> admins) {
         this.config = config;
         this.commandContainer = new CommandContainer(new SendMessageService(this), userService, admins);
+
+        List<BotCommand> botCommands = new ArrayList<>();
+        botCommands.add(new BotCommand("/start", "Get a welcome message"));
+        botCommands.add(new BotCommand("/help", "Info about commands"));
+        botCommands.add(new BotCommand("/deletemydata", "Delete your data"));
+
+        try {
+            this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
+        }
+        catch (TelegramApiException e) {
+            e.getMessage();
+        }
+
     }
 
     @Override

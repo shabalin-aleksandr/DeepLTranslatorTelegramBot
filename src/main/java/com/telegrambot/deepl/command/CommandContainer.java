@@ -20,6 +20,7 @@ public class CommandContainer {
 
         commandMap = ImmutableMap.<String, CommandInterface>builder()
                 .put(START.getCommandName(), new StartCommand(sendMessageServiceInterface, userService))
+                .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
                 .put(WRONG.getCommandName(), new WrongCommand(sendMessageServiceInterface))
                 .build();
