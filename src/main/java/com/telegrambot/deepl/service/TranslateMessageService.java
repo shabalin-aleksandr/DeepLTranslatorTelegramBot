@@ -3,17 +3,11 @@ package com.telegrambot.deepl.service;
 import com.deepl.api.*;
 import com.telegrambot.deepl.bot.DeepLTelegramBot;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 
 @Slf4j
-@PropertySource("application.properties")
 public class TranslateMessageService implements TranslateMessageServiceInterface {
 
     Translator translator;
-
-//    @Value("${deepl.token}")
-//    private String AUTH_KEY;
 
     public TranslateMessageService(DeepLTelegramBot deepLBot) {
     }
@@ -25,7 +19,7 @@ public class TranslateMessageService implements TranslateMessageServiceInterface
 
         TextResult result = null;
         try {
-            result = translator.translateText(message, "en", "ru");
+            result = translator.translateText(message, "en", "cs");
         } catch (DeepLException | InterruptedException e) {
             log.error(e.getMessage());
         }

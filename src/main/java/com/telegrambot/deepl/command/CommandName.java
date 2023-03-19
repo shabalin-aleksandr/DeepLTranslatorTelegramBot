@@ -5,7 +5,8 @@ public enum CommandName {
     DELETE("/deletemydata"),
     HELP("/help"),
     WRONG("nocommand"),
-    TRANSLATE("/translate")
+    TRANSLATE("/tr"),
+    LANGUAGES("/lang")
     ;
 
     private final String commandName;

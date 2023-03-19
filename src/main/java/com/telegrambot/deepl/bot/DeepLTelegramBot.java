@@ -41,7 +41,8 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
         botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
-        botCommands.add(new BotCommand("/translate", "Translate message"));
+        botCommands.add(new BotCommand("/tr", "Translate message"));
+        botCommands.add(new BotCommand("/lang", "List of languages"));
 
         try {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
@@ -61,11 +62,19 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
 
             if (message.startsWith(COMMAND_START)) {
                 String commandId = message.split(" ")[0].toLowerCase();
-                commandContainer.findCommand(commandId, username).execute(update);
+                try {
+                    commandContainer.findCommand(commandId, username).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error occurred: " + e.getMessage());
+                }
                 log.info("This was a response to the user: " +
                         firstName + "(" + username + ") to the command: " + message);
             } else {
-                commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
+                try {
+                    commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error occurred: " + e.getMessage());
+                }
                 log.info("Got a wrong message/command from user: " +
                         firstName + "(" + username + "). Got this message: " + message);
             }
@@ -80,4 +89,5 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return config.getBotToken();
     }
+
 }

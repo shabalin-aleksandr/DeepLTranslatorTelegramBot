@@ -27,6 +27,7 @@ public class CommandContainer {
                 .put(WRONG.getCommandName(), new WrongCommand(sendMessageServiceInterface))
                 .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
                         sendMessageServiceInterface))
+                .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
                 .build();
 
         unknownCommand = new UnknownCommand((SendMessageService) sendMessageServiceInterface);
