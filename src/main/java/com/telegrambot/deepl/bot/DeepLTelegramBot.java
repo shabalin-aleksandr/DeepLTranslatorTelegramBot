@@ -36,7 +36,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
-        botCommands.add(new BotCommand("/deletemydata", "Delete your data"));
+        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
 
         try {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
@@ -57,10 +57,12 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
             if (message.startsWith(COMMAND_START)) {
                 String commandId = message.split(" ")[0].toLowerCase();
                 commandContainer.findCommand(commandId, username).execute(update);
-                log.info("Replied to user: " + firstName + "(" + username + ")");
+                log.info("Replied to user: " +
+                        firstName + "(" + username + ") on message: " + message);
             } else {
                 commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
-                log.info("Got a wrong message/command from user: " + firstName + "(" + username + ")");
+                log.info("Got a wrong message/command from user: " +
+                        firstName + "(" + username + "). Got this message: " + message);
             }
         }
     }

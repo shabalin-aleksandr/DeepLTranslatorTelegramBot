@@ -16,7 +16,7 @@ public class HelpCommand implements CommandInterface {
             
             /help - Display info about acceptable commands
             
-            /deletemydata - This command will delete all data about you
+            /deletemydata - This command will delete all data about you, as well as terminate the bot
             
             ....
             """;

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.sql.Timestamp;
+import java.util.Optional;
+
 
 @Slf4j
 @Component
@@ -18,16 +20,8 @@ public class UserService {
 
     public void registerUser(Message msg) {
         if (userRepositoryInterface.findById(msg.getChatId()).isEmpty()) {
-            var chatId = msg.getChatId();
-            var chat = msg.getChat();
-
             UserRepository userRepository = new UserRepository();
-
-            userRepository.setChatId(chatId);
-            userRepository.setFirstName(chat.getFirstName());
-            userRepository.setLastName(chat.getLastName());
-            userRepository.setUserName(chat.getUserName());
-            userRepository.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+            getUserInfo(msg, userRepository);
 
             userRepositoryInterface.save(userRepository);
             log.info("User saved: " + userRepository);
@@ -35,13 +29,23 @@ public class UserService {
     }
 
     public void deleteUser(Message msg) {
+        Optional<UserRepository> optionalUserRepository = userRepositoryInterface.findById(msg.getChatId());
+        if (optionalUserRepository.isPresent()) {
+            UserRepository userRepository = optionalUserRepository.get();
+
+            userRepositoryInterface.delete(userRepository);
+            log.info("User deleted: " + userRepository);
+        }
+    }
+
+    private void getUserInfo(Message msg, UserRepository userRepository) {
         var chatId = msg.getChatId();
+        var chat = msg.getChat();
 
-        UserRepository userRepository = new UserRepository();
         userRepository.setChatId(chatId);
-
-        userRepositoryInterface.delete(userRepository);
-        log.info("User deleted: " + userRepository);
-
+        userRepository.setFirstName(chat.getFirstName());
+        userRepository.setLastName(chat.getLastName());
+        userRepository.setUserName(chat.getUserName());
+        userRepository.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
     }
 }
