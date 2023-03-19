@@ -4,7 +4,8 @@ public enum CommandName {
     START("/start"),
     DELETE("/deletemydata"),
     HELP("/help"),
-    WRONG("nocommand")
+    WRONG("nocommand"),
+    TRANSLATE("/translate")
     ;
 
     private final String commandName;

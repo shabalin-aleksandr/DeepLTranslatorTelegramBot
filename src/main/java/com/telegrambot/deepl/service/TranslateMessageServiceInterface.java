@@ -1,5 +1,7 @@
 package com.telegrambot.deepl.service;
 
+import com.deepl.api.TextResult;
+
 public interface TranslateMessageServiceInterface {
-    void translateMessage(Long chatId, String message);
+    TextResult translateMessage(String message);
 }

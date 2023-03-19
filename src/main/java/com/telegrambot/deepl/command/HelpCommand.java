@@ -18,7 +18,7 @@ public class HelpCommand implements CommandInterface {
             
             /deletemydata - This command will delete all data about you, as well as terminate the bot
             
-            ....
+            /translate - The command will translate the message you send to the bot
             """;
 
     public HelpCommand(SendMessageServiceInterface sendMessageServiceInterface) {

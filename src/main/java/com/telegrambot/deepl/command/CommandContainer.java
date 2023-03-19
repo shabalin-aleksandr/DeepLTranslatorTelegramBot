@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.telegrambot.deepl.command.annotation.AdminCommand;
 import com.telegrambot.deepl.service.SendMessageService;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
+import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
 import java.util.List;
 import static com.telegrambot.deepl.command.CommandName.*;
@@ -15,6 +16,7 @@ public class CommandContainer {
     private final List<String> admins;
 
     public CommandContainer(SendMessageServiceInterface sendMessageServiceInterface,
+                            TranslateMessageServiceInterface translateMessageServiceInterface,
                             UserService userService, List<String> admins) {
         this.admins = admins;
 
@@ -23,6 +25,8 @@ public class CommandContainer {
                 .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
                 .put(WRONG.getCommandName(), new WrongCommand(sendMessageServiceInterface))
+                .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
+                        sendMessageServiceInterface))
                 .build();
 
         unknownCommand = new UnknownCommand((SendMessageService) sendMessageServiceInterface);

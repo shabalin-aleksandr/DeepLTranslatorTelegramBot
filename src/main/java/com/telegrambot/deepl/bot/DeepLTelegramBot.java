@@ -3,6 +3,7 @@ package com.telegrambot.deepl.bot;
 import com.telegrambot.deepl.command.CommandContainer;
 import com.telegrambot.deepl.config.BotConfig;
 import com.telegrambot.deepl.service.SendMessageService;
+import com.telegrambot.deepl.service.TranslateMessageService;
 import com.telegrambot.deepl.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,16 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     @Autowired
     public DeepLTelegramBot(UserService userService, BotConfig config, List<String> admins) {
         this.config = config;
-        this.commandContainer = new CommandContainer(new SendMessageService(this), userService, admins);
+        this.commandContainer = new CommandContainer(new SendMessageService(this),
+                new TranslateMessageService(this),
+                userService,
+                admins);
 
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
         botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
+        botCommands.add(new BotCommand("/translate", "Translate message"));
 
         try {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
@@ -57,8 +62,8 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
             if (message.startsWith(COMMAND_START)) {
                 String commandId = message.split(" ")[0].toLowerCase();
                 commandContainer.findCommand(commandId, username).execute(update);
-                log.info("Replied to user: " +
-                        firstName + "(" + username + ") on message: " + message);
+                log.info("This was a response to the user: " +
+                        firstName + "(" + username + ") to the command: " + message);
             } else {
                 commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
                 log.info("Got a wrong message/command from user: " +
