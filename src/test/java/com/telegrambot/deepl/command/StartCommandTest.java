@@ -14,17 +14,22 @@
 - limitations under the License.
 */
 
-package com.telegrambot.deepl;
+package com.telegrambot.deepl.command;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import static com.telegrambot.deepl.command.CommandName.START;
+import static com.telegrambot.deepl.command.StartCommand.START_MESSAGE;
 
-@SpringBootTest
-@DisplayName("ApplicationTest")
-public class DeeplTranslatorTelegramBotApplicationTests {
-
-    @Test
-    void contextLoads() {
+public class StartCommandTest extends AbstractCommandTest {
+    @Override
+    String getCommandName() {
+        return START.getCommandName();
+    }
+    @Override
+    String getCommandMessage() {
+        return START_MESSAGE;
+    }
+    @Override
+    CommandInterface getCommand() {
+        return new StartCommand(sendMessageServiceInterface, userService);
     }
 }

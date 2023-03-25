@@ -16,23 +16,23 @@
 
 package com.telegrambot.deepl.command;
 
-import com.telegrambot.deepl.service.SendMessageService;
+import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class UnknownCommand implements CommandInterface {
 
-    private final SendMessageService sendMessageService;
+    private final SendMessageServiceInterface sendMessageServiceInterface;
 
     public static final String UNKNOWN_MESSAGE = """
     I don't understand this command 🥹, you can write /help to see what I understand.
     """;
 
-    public UnknownCommand(SendMessageService sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    public UnknownCommand(SendMessageServiceInterface sendMessageServiceInterface) {
+        this.sendMessageServiceInterface = sendMessageServiceInterface;
     }
 
     @Override
     public void execute(Update update) {
-        sendMessageService.sendMessage(update.getMessage().getChatId(), UNKNOWN_MESSAGE);
+        sendMessageServiceInterface.sendMessage(update.getMessage().getChatId(), UNKNOWN_MESSAGE);
     }
 }

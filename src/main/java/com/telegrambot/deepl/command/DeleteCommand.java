@@ -20,7 +20,7 @@ import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class DeleteCommand implements CommandInterface{
+public class DeleteCommand implements CommandInterface {
 
     private final SendMessageServiceInterface sendMessageServiceInterface;
     private final UserService userService;
