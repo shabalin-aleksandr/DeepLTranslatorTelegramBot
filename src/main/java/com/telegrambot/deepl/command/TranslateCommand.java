@@ -1,25 +1,32 @@
+/*
+- Copyright 2023 Aleksandr Shabalin
+-
+- Licensed under the Apache License, Version 2.0 (the "License");
+- you may not use this file except in compliance with the License.
+- You may obtain a copy of the License at
+-
+- `<http://www.apache.org/licenses/LICENSE-2.0>`
+-
+- Unless required by applicable law or agreed to in writing, software
+- distributed under the License is distributed on an "AS IS" BASIS,
+- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- See the License for the specific language governing permissions and
+- limitations under the License.
+*/
+
 package com.telegrambot.deepl.command;
 
 import com.deepl.api.TextResult;
-import com.telegrambot.deepl.bot.DeepLTelegramBot;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
-import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TranslateCommand implements CommandInterface {
 
     private final TranslateMessageServiceInterface translateMessageServiceInterface;
     private final SendMessageServiceInterface sendMessageServiceInterface;
-    private final Map<Long, BlockingQueue<String>> userInputQueues = new ConcurrentHashMap<>();
-
-    private DeepLTelegramBot deepLBot;
-
 
     public final static String TRANSLATE_MESSAGE = """
             Here's your translated message:\s
@@ -49,5 +56,4 @@ public class TranslateCommand implements CommandInterface {
             sendMessageServiceInterface.sendMessage(chatId, "Sorry, there was an error translating your message.");
         }
     }
-
 }

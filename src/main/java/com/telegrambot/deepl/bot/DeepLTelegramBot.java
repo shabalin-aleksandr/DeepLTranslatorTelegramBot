@@ -1,3 +1,19 @@
+/*
+- Copyright 2023 Aleksandr Shabalin
+-
+- Licensed under the Apache License, Version 2.0 (the "License");
+- you may not use this file except in compliance with the License.
+- You may obtain a copy of the License at
+-
+- `<http://www.apache.org/licenses/LICENSE-2.0>`
+-
+- Unless required by applicable law or agreed to in writing, software
+- distributed under the License is distributed on an "AS IS" BASIS,
+- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- See the License for the specific language governing permissions and
+- limitations under the License.
+*/
+
 package com.telegrambot.deepl.bot;
 
 import com.telegrambot.deepl.command.CommandContainer;
@@ -28,14 +44,12 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
     private final CommandContainer commandContainer;
 
-
     @Autowired
-    public DeepLTelegramBot(UserService userService, BotConfig config, List<String> admins) {
+    public DeepLTelegramBot(UserService userService, BotConfig config) {
         this.config = config;
         this.commandContainer = new CommandContainer(new SendMessageService(this),
                 new TranslateMessageService(this),
-                userService,
-                admins);
+                userService);
 
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
@@ -50,7 +64,6 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
         }
-
     }
 
     @Override
@@ -63,7 +76,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
             if (message.startsWith(COMMAND_START)) {
                 String commandId = message.split(" ")[0].toLowerCase();
                 try {
-                    commandContainer.findCommand(commandId, username).execute(update);
+                    commandContainer.findCommand(commandId).execute(update);
                 } catch (InterruptedException e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
@@ -71,7 +84,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                         firstName + "(" + username + ") to the command: " + message);
             } else {
                 try {
-                    commandContainer.findCommand(WRONG.getCommandName(), username).execute(update);
+                    commandContainer.findCommand(WRONG.getCommandName()).execute(update);
                 } catch (InterruptedException e) {
                     log.error("Error occurred: " + e.getMessage());
                 }
@@ -80,6 +93,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
             }
         }
     }
+
     @Override
     public String getBotUsername() {
         return config.getBotName();
@@ -89,5 +103,4 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return config.getBotToken();
     }
-
 }
