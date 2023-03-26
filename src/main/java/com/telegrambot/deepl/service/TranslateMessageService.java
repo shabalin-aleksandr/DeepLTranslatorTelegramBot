@@ -31,12 +31,12 @@ public class TranslateMessageService implements TranslateMessageServiceInterface
     }
 
     @Override
-    public TextResult translateMessage(String message) {
+    public TextResult translateMessage(String message, String sourceLanguage, String targetLanguage) {
         translator = new Translator(authKey);
 
         TextResult result = null;
         try {
-            result = translator.translateText(message, "en", "cs");
+            result = translator.translateText(message, sourceLanguage, targetLanguage);
         } catch (DeepLException | InterruptedException e) {
             log.error(e.getMessage());
         }

@@ -22,7 +22,8 @@ public enum CommandName {
     HELP("/help"),
     WRONG("nocommand"),
     TRANSLATE("/tr"),
-    LANGUAGES("/lang");
+    LANGUAGES("/languages"),
+    CHANGE("/change");
 
     private final String commandName;
 

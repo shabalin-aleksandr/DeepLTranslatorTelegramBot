@@ -17,6 +17,7 @@
 package com.telegrambot.deepl.bot;
 
 import com.telegrambot.deepl.command.CommandContainer;
+import com.telegrambot.deepl.command.CommandName;
 import com.telegrambot.deepl.config.BotConfig;
 import com.telegrambot.deepl.service.SendMessageService;
 import com.telegrambot.deepl.service.TranslateMessageService;
@@ -33,8 +34,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.telegrambot.deepl.command.CommandName.WRONG;
 
 @Slf4j
 @Component
@@ -54,9 +53,10 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
-        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
         botCommands.add(new BotCommand("/tr", "Translate message"));
-        botCommands.add(new BotCommand("/lang", "List of languages"));
+        botCommands.add(new BotCommand("/change", "Change your language preferences"));
+        botCommands.add(new BotCommand("/languages", "List of languages"));
+        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
 
         try {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
@@ -68,7 +68,13 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
+        if (update.hasCallbackQuery()) {
+            try {
+                commandContainer.findCommand(CommandName.TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                log.error("Error handling callback query: ", e);
+            }
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText().trim();
             String username = update.getMessage().getFrom().getUserName();
             String firstName = update.getMessage().getChat().getFirstName();
@@ -78,18 +84,10 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                 try {
                     commandContainer.findCommand(commandId).execute(update);
                 } catch (InterruptedException e) {
-                    log.error("Error occurred: " + e.getMessage());
+                    log.error("Error executing command: " + commandId, e);
                 }
                 log.info("This was a response to the user: " +
                         firstName + "(" + username + ") to the command: " + message);
-            } else {
-                try {
-                    commandContainer.findCommand(WRONG.getCommandName()).execute(update);
-                } catch (InterruptedException e) {
-                    log.error("Error occurred: " + e.getMessage());
-                }
-                log.info("Got a wrong message/command from user: " +
-                        firstName + "(" + username + "). Got this message: " + message);
             }
         }
     }

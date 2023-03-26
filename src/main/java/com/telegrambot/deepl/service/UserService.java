@@ -16,22 +16,31 @@
 
 package com.telegrambot.deepl.service;
 
+import com.telegrambot.deepl.model.LanguagePair;
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.language.bm.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
+@Service
 public class UserService {
 
     @Autowired
     private UserRepositoryInterface userRepositoryInterface;
+
+    private final Map<Integer, LanguagePair> userLanguagePreferences = new ConcurrentHashMap<>();
 
     public void registerUser(Message msg) {
         if (userRepositoryInterface.findById(msg.getChatId()).isEmpty()) {
@@ -63,4 +72,13 @@ public class UserService {
         userRepository.setUserName(chat.getUserName());
         userRepository.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
     }
+
+    public LanguagePair getUserLanguages(int userId) {
+        return userLanguagePreferences.get(userId);
+    }
+
+    public void setUserLanguages(int userId, String sourceLanguage, String targetLanguage) {
+        userLanguagePreferences.put(userId, new LanguagePair(sourceLanguage, targetLanguage));
+    }
+
 }

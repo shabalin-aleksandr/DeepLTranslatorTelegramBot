@@ -17,43 +17,158 @@
 package com.telegrambot.deepl.command;
 
 import com.deepl.api.TextResult;
+import com.telegrambot.deepl.model.LanguagePair;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
+import com.telegrambot.deepl.service.UserService;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class TranslateCommand implements CommandInterface {
 
     private final TranslateMessageServiceInterface translateMessageServiceInterface;
     private final SendMessageServiceInterface sendMessageServiceInterface;
+    private final UserService userService;
 
     public final static String TRANSLATE_MESSAGE = """
-            Here's your translated message:\s
+            Here's your translated message
             """;
+    private static final String SElECT_LANGUAGE_MESSAGE = "Please the source and target language:";
+
 
     public TranslateCommand(TranslateMessageServiceInterface translateMessageServiceInterface,
-                            SendMessageServiceInterface sendMessageServiceInterface) {
+                            SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
         this.translateMessageServiceInterface = translateMessageServiceInterface;
         this.sendMessageServiceInterface = sendMessageServiceInterface;
+        this.userService = userService;
     }
 
     @Override
     public void execute(Update update) throws InterruptedException {
-        Long chatId = update.getMessage().getChatId();
-        String messageToTranslate = update.getMessage().getText();
+        if (update.hasCallbackQuery()) {
+            try {
+                handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                log.error("Error occurred: " + e.getMessage());
+            }
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
+            Long chatId = update.getMessage().getChatId();
+            String messageToTranslate = update.getMessage().getText();
 
-        log.info("The message that the user wanted to translate: " + messageToTranslate);
+            LanguagePair languagePair = userService.getUserLanguages(Math.toIntExact(chatId));
 
-        sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
+            if (languagePair == null) {
+                Integer messageId = update.getMessage().getMessageId();
+                sendLanguageSelectionMessage(chatId, messageId);
+            } else {
+                String sourceLanguage = languagePair.getSourceLanguage();
+                String targetLanguage = languagePair.getTargetLanguage();
 
-        TextResult result = translateMessageServiceInterface.translateMessage(messageToTranslate);
-        if (result != null) {
-            String translatedText = result.getText().substring(3);
-            sendMessageServiceInterface.sendMessage(chatId, translatedText);
-            log.info("Translated message from the bot: " + translatedText);
-        } else {
-            sendMessageServiceInterface.sendMessage(chatId, "Sorry, there was an error translating your message.");
+                log.info("The message that the user wanted to translate: " + messageToTranslate);
+
+                sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE +
+                        "from " + sourceLanguage + " to " + targetLanguage + ":");
+
+
+                log.info("Source Language: " + sourceLanguage + ", Target Language: " + targetLanguage);
+                TextResult result = translateMessageServiceInterface.translateMessage(messageToTranslate, sourceLanguage, targetLanguage);
+                if (result != null) {
+                    String translatedText = result.getText().substring(3);
+                    sendMessageServiceInterface.sendMessage(chatId, translatedText);
+                    log.info("Translated message from the bot: " + translatedText);
+                } else {
+                    sendMessageServiceInterface.sendMessage(chatId, "Sorry, there was an error translating your message.");
+                }
+            }
         }
+    }
+
+    @Override
+    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+        String[] languageCodes = callbackQuery.getData().split("-");
+        String sourceLanguage = convertEnToEnUs(languageCodes[0]);
+        String targetLanguage = convertEnToEnUs(languageCodes[1]);
+
+        userService.setUserLanguages(Math.toIntExact(callbackQuery.getFrom().getId()), sourceLanguage, targetLanguage);
+
+        EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());
+        editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
+        editMessageText.setText("Selected languages: " + sourceLanguage + " ➡ " + targetLanguage);
+
+        sendMessageServiceInterface.editMessage(editMessageText);
+
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
+
+        sendMessageServiceInterface.answerCallbackQuery(answerCallbackQuery);
+    }
+
+    protected void sendLanguageSelectionMessage(Long chatId, int messageId) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇩🇪 DE", "de", "🇩🇪 DE", "de", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇺🇦 UK", "uk", "🇺🇦 UK", "uk", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇫🇷 FR", "fr", "🇫🇷 FR", "fr", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇪🇸 ES", "es", "🇪🇸 ES", "es", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇮🇹 IT", "it", "🇮🇹 IT", "it", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇩🇪 DE", "de"));
+        keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇩🇪 DE", "de"));
+        keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇫🇷 FR", "fr", "🇫🇷 FR", "fr", "🇩🇪 DE", "de"));
+        keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇮🇹 IT", "it", "🇮🇹 IT", "it", "🇩🇪 DE", "de"));
+        keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇺🇦 UK", "uk", "🇺🇦 UK", "uk", "🇩🇪 DE", "de"));
+
+        inlineKeyboardMarkup.setKeyboard(keyboard);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText(SElECT_LANGUAGE_MESSAGE);
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+        sendMessage.setReplyToMessageId(messageId);
+
+        try {
+            sendMessageServiceInterface.sendMessage(sendMessage);
+        } catch (InterruptedException | TelegramApiException e) {
+            log.error("Error sending language selection message: ", e);
+        }
+    }
+
+    private String convertEnToEnUs(String lang) {
+        if (lang.equals("en")) {
+            return "en-US";
+        }
+        return lang;
+    }
+
+    private List<InlineKeyboardButton> createInlineKeyboardButtonRow(String sourceLanguage1, String sourceCode1,
+                                                                     String targetLanguage1, String targetCode1,
+                                                                     String sourceLanguage2, String sourceCode2,
+                                                                     String targetLanguage2, String targetCode2) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText(String.format("%s - %s", sourceLanguage1, targetLanguage1));
+        button1.setCallbackData(String.format("%s-%s", sourceCode1, targetCode1));
+        row.add(button1);
+
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(String.format("%s - %s", sourceLanguage2, targetLanguage2));
+        button2.setCallbackData(String.format("%s-%s", sourceCode2, targetCode2));
+        row.add(button2);
+
+        return row;
     }
 }

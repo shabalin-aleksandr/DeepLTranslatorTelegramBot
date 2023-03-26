@@ -17,12 +17,14 @@
 package com.telegrambot.deepl.command;
 
 import com.google.common.collect.ImmutableMap;
-import com.telegrambot.deepl.service.SendMessageService;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
 import static com.telegrambot.deepl.command.CommandName.*;
 
+/**
+ * {@link CommandName}
+ */
 public class CommandContainer {
 
     private final CommandInterface unknownCommand;
@@ -38,11 +40,13 @@ public class CommandContainer {
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
                 .put(WRONG.getCommandName(), new WrongCommand(sendMessageServiceInterface))
                 .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
-                        sendMessageServiceInterface))
+                        sendMessageServiceInterface, userService))
+                .put(CHANGE.getCommandName(), new ChangeLanguageCommand(translateMessageServiceInterface,
+                        sendMessageServiceInterface, userService))
                 .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
                 .build();
 
-        unknownCommand = new UnknownCommand((SendMessageService) sendMessageServiceInterface);
+        unknownCommand = new UnknownCommand(sendMessageServiceInterface);
     }
 
     public CommandInterface findCommand(String commandId) {

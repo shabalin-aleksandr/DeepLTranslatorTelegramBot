@@ -17,34 +17,22 @@
 package com.telegrambot.deepl.command;
 
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
+import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
+import com.telegrambot.deepl.service.UserService;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class LanguagesCommand implements CommandInterface {
+public class ChangeLanguageCommand  extends TranslateCommand {
 
-    private final SendMessageServiceInterface sendMessageServiceInterface;
-
-    public final static String LIST_OF_LANGUAGES_MESSAGE = """
-            🇺🇸🇩🇪🇨🇿🇪🇸🇫🇷🇮🇹🇷🇺🇺🇦
-            Here is a list of available languages:
-            
-            🇺🇸 - English
-            🇩🇪 - German
-            🇨🇿 - Czech
-            🇪🇸 - Spanish
-            🇫🇷 - French
-            🇮🇹 - Italian
-            🇷🇺 - Russian
-            🇺🇦 - Ukrainian
-            """;
-
-    public LanguagesCommand(SendMessageServiceInterface sendMessageServiceInterface) {
-        this.sendMessageServiceInterface = sendMessageServiceInterface;
+    public ChangeLanguageCommand(TranslateMessageServiceInterface translateMessageServiceInterface,
+                                 SendMessageServiceInterface sendMessageServiceInterface,
+                                 UserService userService) {
+        super(translateMessageServiceInterface, sendMessageServiceInterface, userService);
     }
 
     @Override
     public void execute(Update update) throws InterruptedException {
         Long chatId = update.getMessage().getChatId();
-
-        sendMessageServiceInterface.sendMessage(chatId, LIST_OF_LANGUAGES_MESSAGE);
+        Integer messageId = update.getMessage().getMessageId();
+        sendLanguageSelectionMessage(chatId, messageId);
     }
 }

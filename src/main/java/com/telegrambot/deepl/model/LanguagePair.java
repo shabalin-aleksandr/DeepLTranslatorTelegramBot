@@ -14,20 +14,23 @@
 - limitations under the License.
 */
 
-package com.telegrambot.deepl.command;
+package com.telegrambot.deepl.model;
 
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+public class LanguagePair {
 
-public interface CommandInterface {
-    /**
-     * Method, which is executing command.
-     */
-    void execute(Update update) throws InterruptedException;
+    private final String sourceLanguage;
+    private final String targetLanguage;
 
-    default void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
-        // Do nothing for commands that don't handle callback queries
+    public LanguagePair(String sourceLanguage, String targetLanguage) {
+        this.sourceLanguage = sourceLanguage;
+        this.targetLanguage = targetLanguage;
     }
 
+    public String getSourceLanguage() {
+        return sourceLanguage;
+    }
+
+    public String getTargetLanguage() {
+        return targetLanguage;
+    }
 }

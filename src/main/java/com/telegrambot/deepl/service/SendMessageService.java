@@ -20,7 +20,9 @@ import com.telegrambot.deepl.bot.DeepLTelegramBot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.List;
 
@@ -58,5 +60,19 @@ public class SendMessageService implements SendMessageServiceInterface{
     public void sendMessage(Long chatId, List<String> messages) {
         if (isEmpty(messages)) return;
         messages.forEach(m -> sendMessage(chatId, m));
+    }
+
+    public void sendMessage(SendMessage message) throws InterruptedException, TelegramApiException {
+        deepLBot.execute(message);
+    }
+
+    @Override
+    public void editMessage(EditMessageText editMessageText) throws TelegramApiException {
+        deepLBot.execute(editMessageText);
+    }
+
+    @Override
+    public void answerCallbackQuery(AnswerCallbackQuery answerCallbackQuery) throws TelegramApiException {
+        deepLBot.execute(answerCallbackQuery);
     }
 }

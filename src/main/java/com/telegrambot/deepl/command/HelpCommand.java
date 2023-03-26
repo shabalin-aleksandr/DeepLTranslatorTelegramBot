@@ -32,11 +32,14 @@ public class HelpCommand implements CommandInterface {
             
             /help - Display info about acceptable commands
             
-            /deletemydata - This command will delete all data about you, as well as terminate the bot
-            
             /tr - The command will translate the message you send to the bot
             
-            /lang - To see a list of available languages that the bot understands
+            /change - This command will change your language preferences
+            
+            /languages - To see a list of available languages that the bot understands
+            
+            /deletemydata - This command will delete all data about you, as well as terminate the bot
+            
             """;
 
     public HelpCommand(SendMessageServiceInterface sendMessageServiceInterface) {
