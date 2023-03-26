@@ -80,8 +80,8 @@ public class TranslateCommand implements CommandInterface {
                 sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE +
                         "from " + sourceLanguage + " to " + targetLanguage + ":");
 
-
                 log.info("Source Language: " + sourceLanguage + ", Target Language: " + targetLanguage);
+
                 TextResult result = translateMessageServiceInterface.translateMessage(messageToTranslate, sourceLanguage, targetLanguage);
                 if (result != null) {
                     String translatedText = result.getText().substring(3);
@@ -119,13 +119,13 @@ public class TranslateCommand implements CommandInterface {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇩🇪 DE", "de", "🇩🇪 DE", "de", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇺🇦 UK", "uk", "🇺🇦 UK", "uk", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇫🇷 FR", "fr", "🇫🇷 FR", "fr", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇪🇸 ES", "es", "🇪🇸 ES", "es", "🇺🇸 EN", "en-US"));
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en-US", "🇮🇹 IT", "it", "🇮🇹 IT", "it", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en ", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇩🇪 DE", "de", "🇩🇪 DE", "de", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇺🇦 UK", "uk", "🇺🇦 UK", "uk", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇫🇷 FR", "fr", "🇫🇷 FR", "fr", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇪🇸 ES", "es", "🇪🇸 ES", "es", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇮🇹 IT", "it", "🇮🇹 IT", "it", "🇺🇸 EN", "en-US"));
         keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇩🇪 DE", "de"));
         keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇩🇪 DE", "de"));
         keyboard.add(createInlineKeyboardButtonRow("🇩🇪 DE", "de", "🇫🇷 FR", "fr", "🇫🇷 FR", "fr", "🇩🇪 DE", "de"));
