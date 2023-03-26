@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    image: doberman786/deepl-bot:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - BOT_NAME=DeepLTranslatorTelegramBot # Put YOUR_BOT_NAME here
+      - BOT_TOKEN=5666007210:AAG_9PaDvdPU5TIAK-cwgkRyrGfNQaWXroY # Put YOUR_BOT_TOKEN here
+      - BOT_DB_URL=jdbc:postgresql://db:5432/deepl-telegram-bot
+      - BOT_DB_USERNAME=postgres
+      - BOT_DB_PASSWORD=786123
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=deepl-telegram-bot
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=786123
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:

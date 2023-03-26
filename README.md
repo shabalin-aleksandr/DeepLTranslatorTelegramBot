@@ -10,7 +10,14 @@ The main idea of the project, to create a Telegram bot for easy and fast transla
 For me as a user, I don't want to have to open a separate app or website every time I want to translate something 
 I've read in Telegram in order to do that. I want to do it without leaving the app.
 
+# How it works
+The Telegram user starts the bot by entering the `/start` command. After this command, the user will be saved to the
+database. Further communication with the bot occurs by means of commands, which can be seen by writing bot `/help`.
+
+![HowItWorksImage](imagesForREADME/image.png)
+
 # Getting Started
+## Necessary parameters for running the bot
 ### Generate Telegram API Token
 To generate your own telegram token, you can use the [BotFather](https://t.me/botfather) and generate the bot's name and token.
 Otherwise, follow [this instruction](https://core.telegram.org/bots/tutorial).
@@ -35,12 +42,19 @@ bot.name=YOUR_BOT_NAME
 ``` java
 private static final String authKey = YOUR_AUTH_KEY // Put your AUTH_KEY here
 ```
+- Do the same steps for [Dockerfile](Dockerfile) and [docker-compose.yml](docker-compose.yml) if you want to use a Docker.
 
-# How it works
-The Telegram user starts the bot by entering the `/start` command. After this command, the user will be saved to the 
-database. Further communication with the bot occurs by means of commands, which can be seen by writing bot `/help`.
+If you want to use your personal database, you will also need to change the appropriate fields in all of the above files.
 
-![HowItWorksImage](image.png)
+# Development
+For development use `docker-compose.yml` file. Required software:
+ - docker
+ - docker-compose
+
+You should run command:
+```
+docker-compose up
+```
 
 # Technology Stack
 - Maven - Project build system.
