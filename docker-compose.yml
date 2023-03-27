@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: doberman786/deepl-bot:latest
+    image: doberman786/deepl-bot:v2
     ports:
       - "8080:8080"
     environment:

@@ -51,7 +51,6 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     @Autowired
     private ApplicationContext applicationContext;
 
-
     @Autowired
     public DeepLTelegramBot(UserService userService, BotConfig config) {
         this.userService = userService;
