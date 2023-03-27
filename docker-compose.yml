@@ -6,13 +6,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - BOT_NAME=DeepLTranslatorTelegramBot # Put YOUR_BOT_NAME here
-      - BOT_TOKEN=5666007210:AAG_9PaDvdPU5TIAK-cwgkRyrGfNQaWXroY # Put YOUR_BOT_TOKEN here
+      - BOT_NAME=<YOUR_BOT_NAME> # Put YOUR_BOT_NAME here
+      - BOT_TOKEN=<YOUR_BOT_TOKEN> # Put YOUR_BOT_TOKEN here
       - BOT_DB_URL=jdbc:postgresql://db:5432/deepl-telegram-bot
       - BOT_DB_USERNAME=postgres
       - BOT_DB_PASSWORD=786123
     depends_on:
       - db
+    restart: always
 
   db:
     image: postgres:13
@@ -24,5 +25,6 @@ services:
       - POSTGRES_PASSWORD=786123
     volumes:
       - db-data:/var/lib/postgresql/data
+    restart: always
 volumes:
   db-data:

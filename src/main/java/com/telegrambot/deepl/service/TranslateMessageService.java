@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TranslateMessageService implements TranslateMessageServiceInterface {
 
-    private static final String authKey = "6b6e8175-9411-a0fb-35ca-6a1797502679:fx"; // Put your AUTH_KEY here
+    private static final String authKey = "YOUR_AUTH_KEY"; // Put your AUTH_KEY here
 
     Translator translator;
 
