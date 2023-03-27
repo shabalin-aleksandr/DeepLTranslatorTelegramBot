@@ -35,6 +35,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.telegrambot.deepl.command.CommandName.TRANSLATE;
+
 @Slf4j
 @Component
 public class DeepLTelegramBot extends TelegramLongPollingBot {
@@ -53,8 +55,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
-        botCommands.add(new BotCommand("/tr", "Translate message"));
-        botCommands.add(new BotCommand("/change", "Change your language preferences"));
+        botCommands.add(new BotCommand("/setlanguages", "Language selection"));
         botCommands.add(new BotCommand("/languages", "List of languages"));
         botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
 
@@ -70,7 +71,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
             try {
-                commandContainer.findCommand(CommandName.TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
+                commandContainer.findCommand(TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
             } catch (TelegramApiException e) {
                 log.error("Error handling callback query: ", e);
             }
@@ -88,6 +89,12 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                 }
                 log.info("This was a response to the user: " +
                         firstName + "(" + username + ") to the command: " + message);
+            } else {
+                try {
+                    commandContainer.findCommand(TRANSLATE.getCommandName()).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error executing TranslateCommand without a command: ", e);
+                }
             }
         }
     }

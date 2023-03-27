@@ -32,10 +32,8 @@ public class HelpCommand implements CommandInterface {
             
             /help - Display info about acceptable commands
             
-            /tr - The command will translate the message you send to the bot
-            
-            /change - This command will change your language preferences
-            
+            /setlanguages - The command displays a menu for selecting a pair of languages for translation.
+                        
             /languages - To see a list of available languages that the bot understands
             
             /deletemydata - This command will delete all data about you, as well as terminate the bot

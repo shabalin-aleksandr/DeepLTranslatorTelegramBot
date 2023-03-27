@@ -16,21 +16,6 @@
 
 package com.telegrambot.deepl.model;
 
-public class LanguagePair {
+public record LanguagePair(String sourceLanguage, String targetLanguage) {
 
-    private final String sourceLanguage;
-    private final String targetLanguage;
-
-    public LanguagePair(String sourceLanguage, String targetLanguage) {
-        this.sourceLanguage = sourceLanguage;
-        this.targetLanguage = targetLanguage;
-    }
-
-    public String getSourceLanguage() {
-        return sourceLanguage;
-    }
-
-    public String getTargetLanguage() {
-        return targetLanguage;
-    }
 }

@@ -38,10 +38,7 @@ public class CommandContainer {
                 .put(START.getCommandName(), new StartCommand(sendMessageServiceInterface, userService))
                 .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
-                .put(WRONG.getCommandName(), new WrongCommand(sendMessageServiceInterface))
                 .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
-                        sendMessageServiceInterface, userService))
-                .put(CHANGE.getCommandName(), new ChangeLanguageCommand(translateMessageServiceInterface,
                         sendMessageServiceInterface, userService))
                 .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
                 .build();

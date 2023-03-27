@@ -44,7 +44,7 @@ public class TranslateCommand implements CommandInterface {
     public final static String TRANSLATE_MESSAGE = """
             Here's your translated message
             """;
-    private static final String SElECT_LANGUAGE_MESSAGE = "Please the source and target language:";
+    private static final String SElECT_LANGUAGE_MESSAGE = "Please select the source and target language:";
 
 
     public TranslateCommand(TranslateMessageServiceInterface translateMessageServiceInterface,
@@ -66,25 +66,26 @@ public class TranslateCommand implements CommandInterface {
             Long chatId = update.getMessage().getChatId();
             String messageToTranslate = update.getMessage().getText();
 
-            LanguagePair languagePair = userService.getUserLanguages(Math.toIntExact(chatId));
-
-            if (languagePair == null) {
+            log.info("Checking if language pair is set for user: " + chatId);
+            if(!userService.isLanguagePairSet(chatId) || "/setlanguages".equalsIgnoreCase(messageToTranslate)) {
                 Integer messageId = update.getMessage().getMessageId();
+                sendMessageServiceInterface.sendMessage(chatId, "Please select languages from the menu:");
                 sendLanguageSelectionMessage(chatId, messageId);
             } else {
-                String sourceLanguage = languagePair.getSourceLanguage();
-                String targetLanguage = languagePair.getTargetLanguage();
+                LanguagePair languagePair = userService.getUserLanguages(Math.toIntExact(chatId));
+                log.info("Language pair found for user " + chatId + ": " + languagePair);
+                String sourceLanguage = languagePair.sourceLanguage();
+                String targetLanguage = languagePair.targetLanguage();
 
                 log.info("The message that the user wanted to translate: " + messageToTranslate);
 
-                sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE +
-                        "from " + sourceLanguage + " to " + targetLanguage + ":");
+                sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
 
                 log.info("Source Language: " + sourceLanguage + ", Target Language: " + targetLanguage);
 
                 TextResult result = translateMessageServiceInterface.translateMessage(messageToTranslate, sourceLanguage, targetLanguage);
                 if (result != null) {
-                    String translatedText = result.getText().substring(3);
+                    String translatedText = result.getText();
                     sendMessageServiceInterface.sendMessage(chatId, translatedText);
                     log.info("Translated message from the bot: " + translatedText);
                 } else {

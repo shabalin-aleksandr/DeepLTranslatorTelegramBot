@@ -19,9 +19,7 @@ package com.telegrambot.deepl.service;
 import com.telegrambot.deepl.model.LanguagePair;
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.language.bm.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -81,4 +79,8 @@ public class UserService {
         userLanguagePreferences.put(userId, new LanguagePair(sourceLanguage, targetLanguage));
     }
 
+    public boolean isLanguagePairSet(Long userId) {
+        LanguagePair languagePair = getUserLanguages(Math.toIntExact(userId));
+        return languagePair != null;
+    }
 }

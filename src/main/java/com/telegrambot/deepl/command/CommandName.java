@@ -20,10 +20,8 @@ public enum CommandName {
     START("/start"),
     DELETE("/deletemydata"),
     HELP("/help"),
-    WRONG("nocommand"),
-    TRANSLATE("/tr"),
-    LANGUAGES("/languages"),
-    CHANGE("/change");
+    TRANSLATE("/setlanguages"),
+    LANGUAGES("/languages");
 
     private final String commandName;
 
