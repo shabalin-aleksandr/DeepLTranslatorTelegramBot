@@ -71,12 +71,20 @@ public class UserService {
         userRepository.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
     }
 
+    public boolean isUserExists(Long chatId) {
+        return userRepositoryInterface.findById(chatId).isPresent();
+    }
+
     public LanguagePair getUserLanguages(int userId) {
         return userLanguagePreferences.get(userId);
     }
 
     public void setUserLanguages(int userId, String sourceLanguage, String targetLanguage) {
         userLanguagePreferences.put(userId, new LanguagePair(sourceLanguage, targetLanguage));
+    }
+
+    public void removeUserLanguages(Long chatId) {
+        userLanguagePreferences.remove(Math.toIntExact(chatId));
     }
 
     public boolean isLanguagePairSet(Long userId) {

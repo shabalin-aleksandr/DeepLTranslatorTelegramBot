@@ -19,8 +19,10 @@ package com.telegrambot.deepl.service;
 import com.deepl.api.*;
 import com.telegrambot.deepl.bot.DeepLTelegramBot;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 public class TranslateMessageService implements TranslateMessageServiceInterface {
 
     private static final String authKey = "6b6e8175-9411-a0fb-35ca-6a1797502679:fx"; // Put your AUTH_KEY here

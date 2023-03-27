@@ -29,6 +29,11 @@ public class DeleteCommand implements CommandInterface {
             ✅Your data were successfully deleted.✅
             
             If you want to go back, just type /start again.
+            
+            To clear your chat history with this bot, please follow these steps:
+            1. Tap on the bot's name at the top of the chat.
+            2. Tap on 'Clear History' (on mobile) or 'Delete Chat' (on desktop).
+            3. Confirm the action.
             """;
 
     public DeleteCommand(SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
@@ -40,6 +45,7 @@ public class DeleteCommand implements CommandInterface {
     public void execute(Update update) {
         Long chatId = update.getMessage().getChatId();
 
+        userService.removeUserLanguages(chatId);
         userService.deleteUser(update.getMessage());
         sendMessageServiceInterface.sendMessage(chatId, DELETE_MESSAGE);
     }
