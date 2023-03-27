@@ -97,7 +97,7 @@ public class TranslateCommand implements CommandInterface {
     @Override
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         String[] languageCodes = callbackQuery.getData().split("-");
-        String sourceLanguage = convertEnToEnUs(languageCodes[0]);
+        String sourceLanguage = languageCodes[0];
         String targetLanguage = convertEnToEnUs(languageCodes[1]);
 
         userService.setUserLanguages(Math.toIntExact(callbackQuery.getFrom().getId()), sourceLanguage, targetLanguage);
@@ -119,7 +119,7 @@ public class TranslateCommand implements CommandInterface {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en ", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇺🇸 EN", "en-US"));
+        keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇨🇿 CZ", "cs", "🇨🇿 CZ", "cs", "🇺🇸 EN", "en-US"));
         keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇩🇪 DE", "de", "🇩🇪 DE", "de", "🇺🇸 EN", "en-US"));
         keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇷🇺 RU", "ru", "🇷🇺 RU", "ru", "🇺🇸 EN", "en-US"));
         keyboard.add(createInlineKeyboardButtonRow("🇺🇸 EN", "en", "🇺🇦 UK", "uk", "🇺🇦 UK", "uk", "🇺🇸 EN", "en-US"));
