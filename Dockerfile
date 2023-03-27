@@ -2,9 +2,9 @@ FROM openjdk:17-jdk
 ARG JAR_FILE=target/*.jar
 
 # Put YOUR_BOT_NAME here
-ENV BOT_NAME=DeepLTranslatorTelegramBot
+ENV BOT_NAME=<YOUR_BOT_NAME>
 # Put YOUR_BOT_TOKEN here
-ENV BOT_TOKEN=5666007210:AAGc7FRtiSkRQNJRwxvL9DqTFgVrOvPLY1w
+ENV BOT_TOKEN=<YOUR_BOT_TOKEN>
 ENV BOT_DB_URL=jdbc:postgresql://host.docker.internal:5432/deepl-telegram-bot
 ENV BOT_DB_USERNAME=postgres
 ENV BOT_DB_PASSWORD=786123

@@ -6,8 +6,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - BOT_NAME=DeepLTranslatorTelegramBot # Put YOUR_BOT_NAME here
-      - BOT_TOKEN=5666007210:AAGc7FRtiSkRQNJRwxvL9DqTFgVrOvPLY1w # Put YOUR_BOT_TOKEN here
+      - BOT_NAME=<YOUR_BOT_NAME> # Put YOUR_BOT_NAME here
+      - BOT_TOKEN=<YOUR_BOT_TOKEN> # Put YOUR_BOT_TOKEN here
       - BOT_DB_URL=jdbc:postgresql://db:5432/deepl-telegram-bot
       - BOT_DB_USERNAME=postgres
       - BOT_DB_PASSWORD=786123
