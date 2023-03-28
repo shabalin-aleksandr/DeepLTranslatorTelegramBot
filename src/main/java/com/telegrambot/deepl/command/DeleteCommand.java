@@ -16,6 +16,7 @@
 
 package com.telegrambot.deepl.command;
 
+import com.telegrambot.deepl.config.ChatIdHolder;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -46,7 +47,8 @@ public class DeleteCommand implements CommandInterface {
         Long chatId = update.getMessage().getChatId();
 
         userService.removeUserLanguages(chatId);
-        userService.deleteUser(update.getMessage());
+        ChatIdHolder chatIdHolder = new ChatIdHolder(chatId);
+        userService.deleteUser(chatIdHolder);
         sendMessageServiceInterface.sendMessage(chatId, DELETE_MESSAGE);
     }
 }

@@ -16,14 +16,25 @@
 
 package com.telegrambot.deepl.command;
 
+import com.telegrambot.deepl.bot.DeepLTelegramBot;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
 public class StartCommand implements CommandInterface {
 
     private final SendMessageServiceInterface sendMessageServiceInterface;
     private final UserService userService;
+    private final DeepLTelegramBot deeplBot;
 
     public final static String START_MESSAGE = """
             🔥Greetings🔥\s
@@ -33,9 +44,12 @@ public class StartCommand implements CommandInterface {
             Write /help and you will find out what I can do.
             """;
 
-    public StartCommand(SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
+    public StartCommand(SendMessageServiceInterface sendMessageServiceInterface,
+                        UserService userService,
+                        DeepLTelegramBot deeplBot) {
         this.sendMessageServiceInterface = sendMessageServiceInterface;
         this.userService = userService;
+        this.deeplBot = deeplBot;
     }
 
     @Override
@@ -43,6 +57,22 @@ public class StartCommand implements CommandInterface {
         Long chatId = update.getMessage().getChatId();
 
         userService.registerUser(update.getMessage());
+        setupBotMenu();
         sendMessageServiceInterface.sendMessage(chatId, START_MESSAGE);
+    }
+
+    private void setupBotMenu() {
+        List<BotCommand> botCommands = new ArrayList<>();
+        botCommands.add(new BotCommand("/start", "Get a welcome message"));
+        botCommands.add(new BotCommand("/help", "Info about commands"));
+        botCommands.add(new BotCommand("/setlanguages", "Language selection"));
+        botCommands.add(new BotCommand("/languages", "List of languages"));
+        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
+
+        try {
+            deeplBot.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+        }
     }
 }

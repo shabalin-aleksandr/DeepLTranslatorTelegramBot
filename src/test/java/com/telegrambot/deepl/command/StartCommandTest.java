@@ -16,6 +16,8 @@
 
 package com.telegrambot.deepl.command;
 
+import com.telegrambot.deepl.config.BotConfig;
+
 import static com.telegrambot.deepl.command.CommandName.START;
 import static com.telegrambot.deepl.command.StartCommand.START_MESSAGE;
 
@@ -30,6 +32,7 @@ public class StartCommandTest extends AbstractCommandTest {
     }
     @Override
     CommandInterface getCommand() {
-        return new StartCommand(sendMessageServiceInterface, userService);
+        BotConfig config = null;
+        return new StartCommand(sendMessageServiceInterface, userService, deeplBot);
     }
 }

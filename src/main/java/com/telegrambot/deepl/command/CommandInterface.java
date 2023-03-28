@@ -29,5 +29,4 @@ public interface CommandInterface {
     default void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         // Do nothing for commands that don't handle callback queries
     }
-
 }

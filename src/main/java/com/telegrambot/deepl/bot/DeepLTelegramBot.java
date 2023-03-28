@@ -18,6 +18,7 @@ package com.telegrambot.deepl.bot;
 
 import com.telegrambot.deepl.command.CommandContainer;
 import com.telegrambot.deepl.config.BotConfig;
+import com.telegrambot.deepl.repository.UserRepositoryInterface;
 import com.telegrambot.deepl.service.SendMessageService;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageService;
@@ -28,14 +29,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
-import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.telegrambot.deepl.command.CommandName.TRANSLATE;
 
@@ -52,26 +47,13 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     private ApplicationContext applicationContext;
 
     @Autowired
-    public DeepLTelegramBot(UserService userService, BotConfig config) {
+    public DeepLTelegramBot(UserService userService, BotConfig config,
+                            UserRepositoryInterface userRepositoryInterface) {
         this.userService = userService;
         this.config = config;
-        this.commandContainer = new CommandContainer( new SendMessageService(this),
+        this.commandContainer = new CommandContainer( new SendMessageService(this, userService),
                 new TranslateMessageService(this),
-                userService);
-
-        List<BotCommand> botCommands = new ArrayList<>();
-        botCommands.add(new BotCommand("/start", "Get a welcome message"));
-        botCommands.add(new BotCommand("/help", "Info about commands"));
-        botCommands.add(new BotCommand("/setlanguages", "Language selection"));
-        botCommands.add(new BotCommand("/languages", "List of languages"));
-        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
-
-        try {
-            this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
-        }
-        catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-        }
+                userService, userRepositoryInterface, config, this);
     }
 
     @Override
@@ -108,6 +90,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                 try {
                     commandContainer.findCommand(TRANSLATE.getCommandName()).execute(update);
                 } catch (InterruptedException e) {
+
                     log.error("Error executing TranslateCommand without a command: ", e);
                 }
             }

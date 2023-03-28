@@ -33,7 +33,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 abstract class AbstractCommandTest {
 
     protected DeepLTelegramBot deeplBot = Mockito.mock(DeepLTelegramBot.class);
-    protected SendMessageServiceInterface sendMessageServiceInterface = new SendMessageService(deeplBot);
+    protected SendMessageServiceInterface sendMessageServiceInterface = new SendMessageService(deeplBot, userService);
     protected UserService userService = Mockito.mock(UserService.class);
 
     abstract String getCommandName();

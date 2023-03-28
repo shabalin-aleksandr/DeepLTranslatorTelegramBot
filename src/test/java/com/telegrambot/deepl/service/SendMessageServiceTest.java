@@ -27,11 +27,12 @@ public class SendMessageServiceTest {
 
     SendMessageServiceInterface sendMessageServiceInterface;
     DeepLTelegramBot deeplBot;
+    UserService userService;
 
     @BeforeEach
     public void init(){
         deeplBot = Mockito.mock(DeepLTelegramBot.class);
-        sendMessageServiceInterface = new SendMessageService(deeplBot);
+        sendMessageServiceInterface = new SendMessageService(deeplBot, userService);
     }
 
     @Test

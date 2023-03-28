@@ -17,6 +17,7 @@
 package com.telegrambot.deepl.service;
 
 import com.telegrambot.deepl.bot.DeepLTelegramBot;
+import com.telegrambot.deepl.config.ChatIdHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,12 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class SendMessageService implements SendMessageServiceInterface{
 
     private final DeepLTelegramBot deepLBot;
+    private final UserService userService;
 
     @Autowired
-    public SendMessageService(DeepLTelegramBot deepLBot) {
+    public SendMessageService(DeepLTelegramBot deepLBot, UserService userService) {
         this.deepLBot = deepLBot;
+        this.userService = userService;
     }
 
     @Override
@@ -53,6 +56,11 @@ public class SendMessageService implements SendMessageServiceInterface{
             deepLBot.execute(sendMessage);
         } catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
+            if (e.getMessage().contains("chat not found")) {
+                log.warn("Failed to send message to chat ID: " + chatId);
+                ChatIdHolder chatIdHolder = new ChatIdHolder(chatId);
+                userService.deleteUser(chatIdHolder);
+            }
         }
     }
 

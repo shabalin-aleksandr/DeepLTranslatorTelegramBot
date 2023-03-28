@@ -14,23 +14,8 @@
 - limitations under the License.
 */
 
-package com.telegrambot.deepl.command;
+package com.telegrambot.deepl.config;
 
-public enum CommandName {
-    START("/start"),
-    DELETE("/deletemydata"),
-    HELP("/help"),
-    TRANSLATE("/setlanguages"),
-    LANGUAGES("/languages"),
-    ADMIN_SEND_COMMAND("/send");
-
-    private final String commandName;
-
-    CommandName(String commandName) {
-        this.commandName = commandName;
-    }
-
-    public String getCommandName() {
-        return commandName;
-    }
+public record ChatIdHolder(Long chatId) {
 }
+

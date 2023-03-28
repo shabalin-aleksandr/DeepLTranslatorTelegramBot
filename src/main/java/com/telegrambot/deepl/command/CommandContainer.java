@@ -17,6 +17,9 @@
 package com.telegrambot.deepl.command;
 
 import com.google.common.collect.ImmutableMap;
+import com.telegrambot.deepl.bot.DeepLTelegramBot;
+import com.telegrambot.deepl.config.BotConfig;
+import com.telegrambot.deepl.repository.UserRepositoryInterface;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
@@ -32,15 +35,19 @@ public class CommandContainer {
 
     public CommandContainer(SendMessageServiceInterface sendMessageServiceInterface,
                             TranslateMessageServiceInterface translateMessageServiceInterface,
-                            UserService userService) {
+                            UserService userService, UserRepositoryInterface userRepository,
+                            BotConfig config,
+                            DeepLTelegramBot deeplBot) {
 
         commandMap = ImmutableMap.<String, CommandInterface>builder()
-                .put(START.getCommandName(), new StartCommand(sendMessageServiceInterface, userService))
+                .put(START.getCommandName(), new StartCommand(sendMessageServiceInterface, userService, deeplBot))
                 .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
                 .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
                         sendMessageServiceInterface, userService))
                 .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
+                .put(ADMIN_SEND_COMMAND.getCommandName(), new SendMessageToAllCommand(userRepository,
+                        sendMessageServiceInterface, config))
                 .build();
 
         unknownCommand = new UnknownCommand(sendMessageServiceInterface);

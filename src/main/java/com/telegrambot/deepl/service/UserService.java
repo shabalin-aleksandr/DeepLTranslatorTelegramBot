@@ -16,6 +16,7 @@
 
 package com.telegrambot.deepl.service;
 
+import com.telegrambot.deepl.config.ChatIdHolder;
 import com.telegrambot.deepl.model.LanguagePair;
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
@@ -50,8 +51,8 @@ public class UserService {
         }
     }
 
-    public void deleteUser(Message msg) {
-        Optional<UserRepository> optionalUserRepository = userRepositoryInterface.findById(msg.getChatId());
+    public void deleteUser(ChatIdHolder chatIdHolder) {
+        Optional<UserRepository> optionalUserRepository = userRepositoryInterface.findById(chatIdHolder.chatId());
         if (optionalUserRepository.isPresent()) {
             UserRepository userRepository = optionalUserRepository.get();
 
