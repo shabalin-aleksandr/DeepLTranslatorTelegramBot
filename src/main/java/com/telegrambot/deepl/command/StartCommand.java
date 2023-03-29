@@ -61,12 +61,13 @@ public class StartCommand implements CommandInterface {
         sendMessageServiceInterface.sendMessage(chatId, START_MESSAGE);
     }
 
-    private void setupBotMenu() {
+    public void setupBotMenu() {
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
-        botCommands.add(new BotCommand("/setlanguages", "Language selection"));
-        botCommands.add(new BotCommand("/languages", "List of languages"));
+        botCommands.add(new BotCommand("/translate", "Translate your message with auto-detection"));
+        botCommands.add(new BotCommand("/setlanguages", "Language pair selection"));
+        botCommands.add(new BotCommand("/languages", "List of available languages"));
         botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
 
         try {

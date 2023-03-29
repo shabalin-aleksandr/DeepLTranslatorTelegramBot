@@ -32,6 +32,8 @@ public class HelpCommand implements CommandInterface {
             
             /help - Display info about acceptable commands
             
+            /translate - This command will automatically detect the language of the message you have sent and translate it into the language of your choice.
+            
             /setlanguages - The command displays a menu for selecting a pair of languages for translation.
                         
             /languages - To see a list of available languages that the bot understands

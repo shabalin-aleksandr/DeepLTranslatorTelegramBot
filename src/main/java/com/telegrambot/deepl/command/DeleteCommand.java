@@ -46,7 +46,8 @@ public class DeleteCommand implements CommandInterface {
     public void execute(Update update) {
         Long chatId = update.getMessage().getChatId();
 
-        userService.removeUserLanguages(chatId);
+        userService.removeUserLanguage(chatId);
+        userService.removeUserLanguagePair(chatId);
         ChatIdHolder chatIdHolder = new ChatIdHolder(chatId);
         userService.deleteUser(chatIdHolder);
         sendMessageServiceInterface.sendMessage(chatId, DELETE_MESSAGE);

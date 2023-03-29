@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TranslateMessageService implements TranslateMessageServiceInterface {
 
-    private static final String authKey = "YOUR_AUTH_KEY"; // Put your DEEPL_AUTH_KEY here
+    private static final String authKey = "<YOUR_AUTH_KEY>"; // Put your DEEPL_AUTH_KEY here
 
     Translator translator;
 
@@ -33,14 +33,27 @@ public class TranslateMessageService implements TranslateMessageServiceInterface
     }
 
     @Override
-    public TextResult translateMessage(String message, String sourceLanguage, String targetLanguage) {
+    public TextResult translateMessageWithSourceLanguage(String message, String sourceLanguage, String targetLanguage) {
         translator = new Translator(authKey);
 
         TextResult result = null;
         try {
             result = translator.translateText(message, sourceLanguage, targetLanguage);
         } catch (DeepLException | InterruptedException e) {
-            log.error(e.getMessage());
+            log.error("Error during translation process: " + e.getMessage());
+        }
+        return result;
+    }
+
+    @Override
+    public TextResult translateAutoDetectedLanguage(String message, String targetLanguage) {
+        translator = new Translator(authKey);
+
+        TextResult result = null;
+        try {
+            result = translator.translateText(message, null, targetLanguage);
+        } catch (DeepLException | InterruptedException e) {
+            log.error("Error during translation process: " + e.getMessage());
         }
         return result;
     }

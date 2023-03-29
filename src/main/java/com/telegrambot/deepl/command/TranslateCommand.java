@@ -17,7 +17,7 @@
 package com.telegrambot.deepl.command;
 
 import com.deepl.api.TextResult;
-import com.telegrambot.deepl.model.LanguagePair;
+import com.telegrambot.deepl.model.LanguagePairSelection;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
@@ -34,6 +34,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.telegrambot.deepl.command.CommandName.SET_LANGUAGE;
+
 @Slf4j
 public class TranslateCommand implements CommandInterface {
 
@@ -42,10 +44,9 @@ public class TranslateCommand implements CommandInterface {
     private final UserService userService;
 
     public final static String TRANSLATE_MESSAGE = """
-            Here's your translated message
+            Here's your translated message:
             """;
-    private static final String SElECT_LANGUAGE_MESSAGE = "Please select the source and target language:";
-
+    private static final String SElECT_LANGUAGE_PAIR_MESSAGE = "Please select the source and target language:";
 
     public TranslateCommand(TranslateMessageServiceInterface translateMessageServiceInterface,
                             SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
@@ -56,6 +57,7 @@ public class TranslateCommand implements CommandInterface {
 
     @Override
     public void execute(Update update) throws InterruptedException {
+        userService.setLastCommandForUser(Math.toIntExact(update.getMessage().getFrom().getId()), SET_LANGUAGE.getCommandName());
         if (update.hasCallbackQuery()) {
             try {
                 handleCallbackQuery(update.getCallbackQuery());
@@ -66,13 +68,12 @@ public class TranslateCommand implements CommandInterface {
             Long chatId = update.getMessage().getChatId();
             String messageToTranslate = update.getMessage().getText();
 
-            log.info("Checking if language pair is set for user: " + chatId);
             if(!userService.isLanguagePairSet(chatId) || "/setlanguages".equalsIgnoreCase(messageToTranslate)) {
                 Integer messageId = update.getMessage().getMessageId();
-                sendMessageServiceInterface.sendMessage(chatId, "Please select languages from the menu:");
-                sendLanguageSelectionMessage(chatId, messageId);
+                sendMessageServiceInterface.sendMessage(chatId, "Please select a pair of languages from the menu:");
+                sendLanguagePairSelectionMessage(chatId, messageId);
             } else {
-                LanguagePair languagePair = userService.getUserLanguages(Math.toIntExact(chatId));
+                LanguagePairSelection languagePair = userService.getUserLanguagePair(Math.toIntExact(chatId));
                 log.info("Language pair found for user " + chatId + ": " + languagePair);
                 String sourceLanguage = languagePair.sourceLanguage();
                 String targetLanguage = languagePair.targetLanguage();
@@ -83,7 +84,7 @@ public class TranslateCommand implements CommandInterface {
 
                 log.info("Source Language: " + sourceLanguage + ", Target Language: " + targetLanguage);
 
-                TextResult result = translateMessageServiceInterface.translateMessage(messageToTranslate, sourceLanguage, targetLanguage);
+                TextResult result = translateMessageServiceInterface.translateMessageWithSourceLanguage(messageToTranslate, sourceLanguage, targetLanguage);
                 if (result != null) {
                     String translatedText = result.getText();
                     sendMessageServiceInterface.sendMessage(chatId, translatedText);
@@ -97,11 +98,13 @@ public class TranslateCommand implements CommandInterface {
 
     @Override
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+        userService.setLastCommandForUser(Math.toIntExact(callbackQuery.getFrom().getId()), SET_LANGUAGE.getCommandName());
+
         String[] languageCodes = callbackQuery.getData().split("-");
         String sourceLanguage = languageCodes[0];
         String targetLanguage = convertEnToEnUs(languageCodes[1]);
 
-        userService.setUserLanguages(Math.toIntExact(callbackQuery.getFrom().getId()), sourceLanguage, targetLanguage);
+        userService.setUserLanguagePair(Math.toIntExact(callbackQuery.getFrom().getId()), sourceLanguage, targetLanguage);
 
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());
@@ -116,7 +119,7 @@ public class TranslateCommand implements CommandInterface {
         sendMessageServiceInterface.answerCallbackQuery(answerCallbackQuery);
     }
 
-    protected void sendLanguageSelectionMessage(Long chatId, int messageId) {
+    protected void sendLanguagePairSelectionMessage(Long chatId, int messageId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -137,7 +140,7 @@ public class TranslateCommand implements CommandInterface {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(SElECT_LANGUAGE_MESSAGE);
+        sendMessage.setText(SElECT_LANGUAGE_PAIR_MESSAGE);
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
         sendMessage.setReplyToMessageId(messageId);
 

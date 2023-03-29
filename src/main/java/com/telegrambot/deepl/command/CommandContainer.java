@@ -41,11 +41,13 @@ public class CommandContainer {
 
         commandMap = ImmutableMap.<String, CommandInterface>builder()
                 .put(START.getCommandName(), new StartCommand(sendMessageServiceInterface, userService, deeplBot))
-                .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(HELP.getCommandName(), new HelpCommand(sendMessageServiceInterface))
-                .put(TRANSLATE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
+                .put(AUTO_TRANSLATE.getCommandName(), new AutoTranslateCommand(translateMessageServiceInterface,
+                        sendMessageServiceInterface, userService))
+                .put(SET_LANGUAGE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
                         sendMessageServiceInterface, userService))
                 .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
+                .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(ADMIN_SEND_COMMAND.getCommandName(), new SendMessageToAllCommand(userRepository,
                         sendMessageServiceInterface, config))
                 .build();

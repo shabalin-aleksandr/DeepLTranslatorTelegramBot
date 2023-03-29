@@ -16,6 +16,6 @@
 
 package com.telegrambot.deepl.model;
 
-public record LanguagePair(String sourceLanguage, String targetLanguage) {
+public record LanguageSelection(String targetLanguage) {
 
 }

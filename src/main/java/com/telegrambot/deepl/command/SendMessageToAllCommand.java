@@ -54,7 +54,7 @@ public class SendMessageToAllCommand implements CommandInterface {
             for (UserRepository user : users) {
                 sendMessageServiceInterface.sendMessage(user.getChatId(), textToSend);
             }
-            log.info("Admin: " + username + " with id: " + chatId + " using an Admin command");
+            log.info("Admin: " + username + " with id: " + chatId + " using an Admin command: /send");
         } else {
             unknownCommand.execute(update);
             log.info("User: " +username + " with id: " + chatId + " was trying to use Admin command");

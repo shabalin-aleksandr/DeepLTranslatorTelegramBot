@@ -17,7 +17,8 @@
 package com.telegrambot.deepl.service;
 
 import com.telegrambot.deepl.config.ChatIdHolder;
-import com.telegrambot.deepl.model.LanguagePair;
+import com.telegrambot.deepl.model.LanguagePairSelection;
+import com.telegrambot.deepl.model.LanguageSelection;
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,9 @@ public class UserService {
     @Autowired
     private UserRepositoryInterface userRepositoryInterface;
 
-    private final Map<Integer, LanguagePair> userLanguagePreferences = new ConcurrentHashMap<>();
+    private final Map<Integer, LanguagePairSelection> userLanguagePairPreferences = new ConcurrentHashMap<>();
+    private final Map<Integer, LanguageSelection> userLanguagePreferences = new ConcurrentHashMap<>();
+    private final Map<Integer, String> lastCommandByUser = new ConcurrentHashMap<>();
 
     public void registerUser(Message msg) {
         if (userRepositoryInterface.findById(msg.getChatId()).isEmpty()) {
@@ -76,20 +79,46 @@ public class UserService {
         return userRepositoryInterface.findById(chatId).isPresent();
     }
 
-    public LanguagePair getUserLanguages(int userId) {
+    public LanguagePairSelection getUserLanguagePair(int userId) {
+        return userLanguagePairPreferences.get(userId);
+    }
+
+    public LanguageSelection getUserLanguage(int userId) {
         return userLanguagePreferences.get(userId);
     }
 
-    public void setUserLanguages(int userId, String sourceLanguage, String targetLanguage) {
-        userLanguagePreferences.put(userId, new LanguagePair(sourceLanguage, targetLanguage));
+    public void setUserLanguagePair(int userId, String sourceLanguage, String targetLanguage) {
+        userLanguagePairPreferences.put(userId, new LanguagePairSelection(sourceLanguage, targetLanguage));
     }
 
-    public void removeUserLanguages(Long chatId) {
+    public void setUserLanguage(int userId, String targetLanguage) {
+        userLanguagePreferences.put(userId, new LanguageSelection(targetLanguage));
+    }
+
+    public void removeUserLanguagePair(Long chatId) {
+        userLanguagePairPreferences.remove(Math.toIntExact(chatId));
+    }
+
+    public void removeUserLanguage(Long chatId) {
         userLanguagePreferences.remove(Math.toIntExact(chatId));
     }
 
     public boolean isLanguagePairSet(Long userId) {
-        LanguagePair languagePair = getUserLanguages(Math.toIntExact(userId));
+        LanguagePairSelection languagePair = getUserLanguagePair(Math.toIntExact(userId));
         return languagePair != null;
     }
+
+    public boolean isLanguageSet(Long userId) {
+        LanguageSelection languageSelection = getUserLanguage(Math.toIntExact(userId));
+        return languageSelection != null;
+    }
+
+    public void setLastCommandForUser(Integer userId, String command) {
+        lastCommandByUser.put(userId, command);
+    }
+
+    public String getLastCommandForUser(Integer userId) {
+        return lastCommandByUser.get(userId);
+    }
+
 }

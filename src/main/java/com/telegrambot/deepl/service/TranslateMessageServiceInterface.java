@@ -19,5 +19,6 @@ package com.telegrambot.deepl.service;
 import com.deepl.api.TextResult;
 
 public interface TranslateMessageServiceInterface {
-    TextResult translateMessage(String message, String sourceLanguage, String targetLanguage);
+    TextResult translateMessageWithSourceLanguage(String message, String sourceLanguage, String targetLanguage);
+    TextResult translateAutoDetectedLanguage(String message, String targetLanguage);
 }

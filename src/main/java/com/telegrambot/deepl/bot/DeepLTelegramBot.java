@@ -32,7 +32,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static com.telegrambot.deepl.command.CommandName.TRANSLATE;
+import static com.telegrambot.deepl.command.CommandName.SET_LANGUAGE;
+import static com.telegrambot.deepl.command.CommandName.AUTO_TRANSLATE;
 
 @Slf4j
 @Component
@@ -59,39 +60,77 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
+            processCallbackQuery(update);
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
+            processMessageUpdate(update);
+        }
+    }
+
+    private void processCallbackQuery(Update update) {
+        Integer userId = Math.toIntExact(update.getCallbackQuery().getFrom().getId());
+        String lastCommand = userService.getLastCommandForUser(userId);
+        log.warn(lastCommand);
+
+        if (AUTO_TRANSLATE.getCommandName().equals(lastCommand)) {
             try {
-                commandContainer.findCommand(TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
+                commandContainer.findCommand(AUTO_TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
             } catch (TelegramApiException e) {
                 log.error("Error handling callback query: ", e);
             }
-        } else if (update.hasMessage() && update.getMessage().hasText()) {
-            Long chatId = update.getMessage().getChatId();
-            String message = update.getMessage().getText().trim();
-            String username = update.getMessage().getFrom().getUserName();
-            String firstName = update.getMessage().getChat().getFirstName();
+        } else if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
+            try {
+                commandContainer.findCommand(SET_LANGUAGE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                log.error("Error handling callback query: ", e);
+            }
+        }
+    }
 
-            if (message.startsWith(COMMAND_START)) {
-                String commandId = message.split(" ")[0].toLowerCase();
-                boolean userExists = userService.isUserExists(chatId);
+    private void processMessageUpdate(Update update) {
+        Long chatId = update.getMessage().getChatId();
+        String message = update.getMessage().getText().trim();
+        String username = update.getMessage().getFrom().getUserName();
+        String firstName = update.getMessage().getChat().getFirstName();
+        String commandId = null;
 
-                if (!userExists && !commandId.equals("/start")) {
-                    SendMessageServiceInterface sendMessageServiceInterface = applicationContext.getBean(SendMessageService.class);
-                    sendMessageServiceInterface.sendMessage(chatId, "Please use /start to begin using the bot again.");
-                } else {
-                    try {
-                        commandContainer.findCommand(commandId).execute(update);
-                    } catch (InterruptedException e) {
-                        log.error("Error executing command: " + commandId, e);
-                    }
-                    log.info("This was a response to the user: " +
-                            firstName + "(" + username + ") to the command: " + message);
+        if (message.startsWith(COMMAND_START)) {
+            commandId = message.split(" ")[0].toLowerCase();
+        } else if (message.equalsIgnoreCase("/translate")) {
+            commandId = AUTO_TRANSLATE.getCommandName();
+        } else if (message.equalsIgnoreCase("/setlanguages")) {
+            commandId = SET_LANGUAGE.getCommandName();
+        }
+
+        if (commandId != null) {
+            boolean userExists = userService.isUserExists(chatId);
+
+            if (!userExists && !commandId.equals("/start")) {
+                SendMessageServiceInterface sendMessageServiceInterface = applicationContext.getBean(SendMessageService.class);
+                sendMessageServiceInterface.sendMessage(chatId, "Please use /start to begin using the bot again.");
+            } else {
+                try {
+                    commandContainer.findCommand(commandId).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error executing command: " + commandId, e);
+                }
+                log.info("This was a response to the user: " +
+                        firstName + "(" + username + ") to the command: " + message);
+            }
+        } else {
+            Integer userId = Math.toIntExact(update.getMessage().getFrom().getId());
+            String lastCommand = userService.getLastCommandForUser(userId);
+            assert SET_LANGUAGE.getCommandName() != null;
+            if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
+                try {
+                    commandContainer.findCommand(SET_LANGUAGE.getCommandName()).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error executing SetLanguageCommand: ", e);
                 }
             } else {
                 try {
-                    commandContainer.findCommand(TRANSLATE.getCommandName()).execute(update);
+                    commandContainer.findCommand(AUTO_TRANSLATE.getCommandName()).execute(update);
                 } catch (InterruptedException e) {
-
-                    log.error("Error executing TranslateCommand without a command: ", e);
+                    log.error("Error executing TranslateCommand with auto-detection: ", e);
                 }
             }
         }
