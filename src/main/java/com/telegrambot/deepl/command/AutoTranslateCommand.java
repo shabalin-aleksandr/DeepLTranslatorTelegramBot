@@ -43,12 +43,17 @@ public class AutoTranslateCommand implements CommandInterface {
     private final UserService userService;
 
     public final static String TRANSLATE_MESSAGE = """
-            If your translation is not correct, you can always select specific languages with the command: /setlanguages\s
+            If your translation isn't correct, you can always select specific languages with the command 👉 /setlanguages\s
             
-            🌐 Here's your translated message 🌐:
+            👇 Here's your translated message 👇
             """;
 
-    private static final String SELECT_LANGUAGE_MESSAGE = "Please choose the language you want me to translate your message into:";
+    private static final String SELECT_LANGUAGE_MESSAGE = "🌐 Please choose the language you want me to translate your message into 🌐";
+    private static final String WRITE_MESSAGE = """
+            \s
+            🖋🖋🖋
+            Now enter a message for translation, if you already wrote it, then just forward it to me again.
+            """;
 
     public AutoTranslateCommand(TranslateMessageServiceInterface translateMessageServiceInterface, SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
         this.translateMessageServiceInterface = translateMessageServiceInterface;
@@ -73,7 +78,6 @@ public class AutoTranslateCommand implements CommandInterface {
 
             if (!userService.isLanguageSet(chatId) || "/translate".equalsIgnoreCase(messageToTranslate)) {
                 Integer messageId = update.getMessage().getMessageId();
-                sendMessageServiceInterface.sendMessage(chatId, "Please select language from menu:");
                 sendLanguageSelectionMessage(chatId, messageId);
             } else {
                 LanguageSelection selectedLanguage = userService.getUserLanguage(Math.toIntExact(chatId));
@@ -82,15 +86,15 @@ public class AutoTranslateCommand implements CommandInterface {
 
                 log.info("The message that the user wanted to translate: \"" + messageToTranslate + "\" into <" + targetLanguage + "> language");
 
-                sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
-
                 TextResult result = translateMessageServiceInterface.translateAutoDetectedLanguage(messageToTranslate, targetLanguage);
                 if (result != null) {
                     String translatedText = result.getText();
+                    sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
                     sendMessageServiceInterface.sendMessage(chatId, translatedText);
                     log.info("Translated message from the bot: " + translatedText);
                 } else {
-                    sendMessageServiceInterface.sendMessage(chatId, "Sorry, there was an error translating your message.");
+                    sendMessageServiceInterface.sendMessage(chatId, "\uD83E\uDD2B An unexpected error occurred during translation. I may not be able to recognise the language. " +
+                            "Try to set up a pair of languages with /setlanguages or write to the administrator if I still don't know your language.");
                 }
             }
         }
@@ -107,7 +111,7 @@ public class AutoTranslateCommand implements CommandInterface {
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());
         editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
-        editMessageText.setText("Selected language: " + targetLanguage);
+        editMessageText.setText("Selected language: " + getLanguageName(targetLanguage) + WRITE_MESSAGE);
 
         sendMessageServiceInterface.editMessage(editMessageText);
 
@@ -168,5 +172,19 @@ public class AutoTranslateCommand implements CommandInterface {
         }
 
         return languageCode;
+    }
+
+    private String getLanguageName(String languageCode) {
+        return switch (languageCode) {
+            case "en-US" -> "🇺🇸 English (US)";
+            case "de" -> "🇩🇪 German";
+            case "cs" -> "🇨🇿 Czech";
+            case "fr" -> "🇫🇷 French";
+            case "es" -> "🇪🇸 Spanish";
+            case "it" -> "🇮🇹 Italian";
+            case "ru" -> "🇷🇺 Russian";
+            case "uk" -> "🇺🇦 Ukrainian";
+            default -> "⭕️ Unknown";
+        };
     }
 }

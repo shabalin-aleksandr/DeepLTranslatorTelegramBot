@@ -47,6 +47,7 @@ public class CommandContainer {
                 .put(SET_LANGUAGE.getCommandName(), new TranslateCommand(translateMessageServiceInterface,
                         sendMessageServiceInterface, userService))
                 .put(LANGUAGES.getCommandName(), new LanguagesCommand(sendMessageServiceInterface))
+                .put(ADMIN_CONTACTS.getCommandName(), new AdminContactsCommand(sendMessageServiceInterface))
                 .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(ADMIN_SEND_COMMAND.getCommandName(), new SendMessageToAllCommand(userRepository,
                         sendMessageServiceInterface, config))

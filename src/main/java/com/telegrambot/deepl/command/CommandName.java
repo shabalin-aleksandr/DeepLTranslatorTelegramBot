@@ -22,6 +22,7 @@ public enum CommandName {
     AUTO_TRANSLATE("/translate"),
     SET_LANGUAGE("/setlanguages"),
     LANGUAGES("/languages"),
+    ADMIN_CONTACTS("/support"),
     DELETE("/deletemydata"),
     ADMIN_SEND_COMMAND("/send");
 

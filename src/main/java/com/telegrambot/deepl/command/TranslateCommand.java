@@ -44,9 +44,14 @@ public class TranslateCommand implements CommandInterface {
     private final UserService userService;
 
     public final static String TRANSLATE_MESSAGE = """
-            Here's your translated message:
+            👇 Here's your translated message 👇
             """;
-    private static final String SElECT_LANGUAGE_PAIR_MESSAGE = "Please select the source and target language:";
+    private static final String SElECT_LANGUAGE_PAIR_MESSAGE = "🌐 Select the language pair you want to use from the menu 🌐";
+    private static final String WRITE_MESSAGE = """
+            \s
+            🖋🖋🖋
+            Now enter a message for translation, if you already wrote it, then just forward it to me again.
+            """;
 
     public TranslateCommand(TranslateMessageServiceInterface translateMessageServiceInterface,
                             SendMessageServiceInterface sendMessageServiceInterface, UserService userService) {
@@ -70,7 +75,6 @@ public class TranslateCommand implements CommandInterface {
 
             if(!userService.isLanguagePairSet(chatId) || "/setlanguages".equalsIgnoreCase(messageToTranslate)) {
                 Integer messageId = update.getMessage().getMessageId();
-                sendMessageServiceInterface.sendMessage(chatId, "Please select a pair of languages from the menu:");
                 sendLanguagePairSelectionMessage(chatId, messageId);
             } else {
                 LanguagePairSelection languagePair = userService.getUserLanguagePair(Math.toIntExact(chatId));
@@ -109,7 +113,7 @@ public class TranslateCommand implements CommandInterface {
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());
         editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
-        editMessageText.setText("Selected languages: " + sourceLanguage + " ➡ " + targetLanguage);
+        editMessageText.setText("Selected languages: " + getLanguageName(sourceLanguage) + " ➡ " + getLanguageName(targetLanguage) + WRITE_MESSAGE);
 
         sendMessageServiceInterface.editMessage(editMessageText);
 
@@ -151,12 +155,7 @@ public class TranslateCommand implements CommandInterface {
         }
     }
 
-    private String convertEnToEnUs(String lang) {
-        if (lang.equals("en")) {
-            return "en-US";
-        }
-        return lang;
-    }
+
 
     private List<InlineKeyboardButton> createInlineKeyboardButtonRow(String sourceLanguage1, String sourceCode1,
                                                                      String targetLanguage1, String targetCode1,
@@ -174,5 +173,26 @@ public class TranslateCommand implements CommandInterface {
         row.add(button2);
 
         return row;
+    }
+
+    private String getLanguageName(String languageCode) {
+        return switch (languageCode) {
+            case "en-US", "en" -> "🇺🇸 English (US)";
+            case "de" -> "🇩🇪 German";
+            case "cs" -> "🇨🇿 Czech";
+            case "fr" -> "🇫🇷 French";
+            case "es" -> "🇪🇸 Spanish";
+            case "it" -> "🇮🇹 Italian";
+            case "ru" -> "🇷🇺 Russian";
+            case "uk" -> "🇺🇦 Ukrainian";
+            default -> "⭕️ Unknown";
+        };
+    }
+
+    private String convertEnToEnUs(String lang) {
+        if (lang.equals("en")) {
+            return "en-US";
+        }
+        return lang;
     }
 }

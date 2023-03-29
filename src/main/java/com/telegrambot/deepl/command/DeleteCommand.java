@@ -33,7 +33,7 @@ public class DeleteCommand implements CommandInterface {
             
             To clear your chat history with this bot, please follow these steps:
             1. Tap on the bot's name at the top of the chat.
-            2. Tap on 'Clear History' (on mobile) or 'Delete Chat' (on desktop).
+            2. Tap on 'Clear Messages' (on mobile) or 'Clear Chat History' (on desktop).
             3. Confirm the action.
             """;
 

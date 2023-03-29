@@ -24,21 +24,23 @@ public class HelpCommand implements CommandInterface {
     private final SendMessageServiceInterface sendMessageServiceInterface;
 
     public final static String HELP_MESSAGE = """
-            ℹ️HELP MENUℹ️
+            ℹ️ HELP MENU ℹ️
             
-            Here you can see commands what I can understand:
+            🔻 Here you can see commands what I can understand 🔻
             
-            /start - Display greeting message
+            ❇️ /start - Display greeting message
             
-            /help - Display info about acceptable commands
+            🧠 /help - Display info about acceptable commands
             
-            /translate - This command will automatically detect the language of the message you have sent and translate it into the language of your choice.
+            🌐 /translate - This command will automatically detect the language of the message you have sent and translate it into the language of your choice
             
-            /setlanguages - The command displays a menu for selecting a pair of languages for translation.
+            👀 /setlanguages - The command displays a menu for selecting a pair of languages for translation
                         
-            /languages - To see a list of available languages that the bot understands
+            📙 /languages - To see a list of available languages that the bot understands
             
-            /deletemydata - This command will delete all data about you, as well as terminate the bot
+            💭 /support - View bot administrator contacts
+            
+            ⛔️ /deletemydata - This command will delete all data about you, as well as terminate the bot
             
             """;
 

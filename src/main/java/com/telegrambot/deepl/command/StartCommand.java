@@ -41,7 +41,11 @@ public class StartCommand implements CommandInterface {
             
             My name is DeepLTranslatorBot, as you may have understood from my name I am designed to translate text from one language to another.\s
             
+            👇👇👇
+            
             Write /help and you will find out what I can do.
+            
+            I hope you will enjoy working with me.😇
             """;
 
     public StartCommand(SendMessageServiceInterface sendMessageServiceInterface,
@@ -68,6 +72,7 @@ public class StartCommand implements CommandInterface {
         botCommands.add(new BotCommand("/translate", "Translate your message with auto-detection"));
         botCommands.add(new BotCommand("/setlanguages", "Language pair selection"));
         botCommands.add(new BotCommand("/languages", "List of available languages"));
+        botCommands.add(new BotCommand("/support", "Admin contacts"));
         botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
 
         try {

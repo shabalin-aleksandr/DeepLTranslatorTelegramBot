@@ -19,36 +19,29 @@ package com.telegrambot.deepl.command;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class LanguagesCommand implements CommandInterface {
+public class AdminContactsCommand implements CommandInterface {
 
     private final SendMessageServiceInterface sendMessageServiceInterface;
 
-    public final static String LIST_OF_LANGUAGES_MESSAGE = """
-            🇺🇸🇩🇪🇨🇿🇪🇸🇫🇷🇮🇹🇷🇺🇺🇦
-            Here is a list of available languages:
+    public final static String ADMIN_CONTACTS_MESSAGE = """
             
-            🇺🇸 - English
-            🇩🇪 - German
-            🇨🇿 - Czech
-            🇪🇸 - Spanish
-            🇫🇷 - French
-            🇮🇹 - Italian
-            🇷🇺 - Russian
-            🇺🇦 - Ukrainian
-            
-            You can use all of these languages in auto-define language mode with /translate.\s
-            
-            You can also use these languages with the command /setlanguages.
+            ✨ In case of any questions, you can contact the Admin of this bot ✨
+                        
+            ✈️ Telegram: @Doberman786
+            📩 Gmail: dev.aleksandr2000@gmail.com
+            📸 Instagram: https://www.instagram.com/_dbrmn_/
+                        
+            📣 Also, you can send your feedback regarding the use of the bot, this will help make it better.
             """;
 
-    public LanguagesCommand(SendMessageServiceInterface sendMessageServiceInterface) {
+    public AdminContactsCommand(SendMessageServiceInterface sendMessageServiceInterface) {
         this.sendMessageServiceInterface = sendMessageServiceInterface;
     }
 
     @Override
-    public void execute(Update update) throws InterruptedException {
+    public void execute(Update update) {
         Long chatId = update.getMessage().getChatId();
 
-        sendMessageServiceInterface.sendMessage(chatId, LIST_OF_LANGUAGES_MESSAGE);
+        sendMessageServiceInterface.sendMessage(chatId, ADMIN_CONTACTS_MESSAGE);
     }
 }
