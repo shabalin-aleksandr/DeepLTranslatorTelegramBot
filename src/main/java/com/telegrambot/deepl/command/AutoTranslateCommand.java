@@ -42,14 +42,11 @@ public class AutoTranslateCommand implements CommandInterface {
     private final SendMessageServiceInterface sendMessageServiceInterface;
     private final UserService userService;
 
-    public final static String TRANSLATE_MESSAGE = """
-            If your translation isn't correct, you can always select specific languages with the command 👉 /setlanguages\s
-            
-            👇 Here's your translated message 👇
-            """;
-
     private static final String SELECT_LANGUAGE_MESSAGE = "🌐 Please choose the language you want me to translate your message into 🌐";
     private static final String WRITE_MESSAGE = """
+            \s
+            \s
+            If your translation isn't correct, you can always select specific languages with the command 👉 /setlanguages\s
             \s
             🖋🖋🖋
             Now enter a message for translation, if you already wrote it, then just forward it to me again.
@@ -63,7 +60,7 @@ public class AutoTranslateCommand implements CommandInterface {
 
     @Override
     public void execute(Update update) throws InterruptedException {
-        userService.setLastCommandForUser(Math.toIntExact(update.getMessage().getFrom().getId()), AUTO_TRANSLATE.getCommandName());
+        userService.setLastCommandForUser(update.getMessage().getFrom().getId(), AUTO_TRANSLATE.getCommandName());
 
         if (update.hasCallbackQuery()) {
             try {
@@ -80,7 +77,7 @@ public class AutoTranslateCommand implements CommandInterface {
                 Integer messageId = update.getMessage().getMessageId();
                 sendLanguageSelectionMessage(chatId, messageId);
             } else {
-                LanguageSelection selectedLanguage = userService.getUserLanguage(Math.toIntExact(chatId));
+                LanguageSelection selectedLanguage = userService.getUserLanguage(chatId);
                 log.info("The user: " + username + " has selected a language to translate the message: " + selectedLanguage);
                 String targetLanguage = convertEnToEnUs(selectedLanguage.targetLanguage());
 
@@ -89,7 +86,7 @@ public class AutoTranslateCommand implements CommandInterface {
                 TextResult result = translateMessageServiceInterface.translateAutoDetectedLanguage(messageToTranslate, targetLanguage);
                 if (result != null) {
                     String translatedText = result.getText();
-                    sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
+                    //sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
                     sendMessageServiceInterface.sendMessage(chatId, translatedText);
                     log.info("Translated message from the bot: " + translatedText);
                 } else {
@@ -102,11 +99,11 @@ public class AutoTranslateCommand implements CommandInterface {
 
     @Override
     public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
-        userService.setLastCommandForUser(Math.toIntExact(callbackQuery.getFrom().getId()), AUTO_TRANSLATE.getCommandName());
+        userService.setLastCommandForUser(callbackQuery.getFrom().getId(), AUTO_TRANSLATE.getCommandName());
         String languageCode = callbackQuery.getData();
         String targetLanguage = convertEnToEnUs(languageCode);
 
-        userService.setUserLanguage(Math.toIntExact(callbackQuery.getFrom().getId()), targetLanguage);
+        userService.setUserLanguage(callbackQuery.getFrom().getId(), targetLanguage);
 
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());

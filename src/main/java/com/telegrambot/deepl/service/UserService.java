@@ -40,9 +40,9 @@ public class UserService {
     @Autowired
     private UserRepositoryInterface userRepositoryInterface;
 
-    private final Map<Integer, LanguagePairSelection> userLanguagePairPreferences = new ConcurrentHashMap<>();
-    private final Map<Integer, LanguageSelection> userLanguagePreferences = new ConcurrentHashMap<>();
-    private final Map<Integer, String> lastCommandByUser = new ConcurrentHashMap<>();
+    private final Map<Long, LanguagePairSelection> userLanguagePairPreferences = new ConcurrentHashMap<>();
+    private final Map<Long, LanguageSelection> userLanguagePreferences = new ConcurrentHashMap<>();
+    private final Map<Long, String> lastCommandByUser = new ConcurrentHashMap<>();
 
     public void registerUser(Message msg) {
         if (userRepositoryInterface.findById(msg.getChatId()).isEmpty()) {
@@ -79,46 +79,45 @@ public class UserService {
         return userRepositoryInterface.findById(chatId).isPresent();
     }
 
-    public LanguagePairSelection getUserLanguagePair(int userId) {
+    public LanguagePairSelection getUserLanguagePair(Long userId) {
         return userLanguagePairPreferences.get(userId);
     }
 
-    public LanguageSelection getUserLanguage(int userId) {
+    public LanguageSelection getUserLanguage(Long userId) {
         return userLanguagePreferences.get(userId);
     }
 
-    public void setUserLanguagePair(int userId, String sourceLanguage, String targetLanguage) {
+    public void setUserLanguagePair(Long userId, String sourceLanguage, String targetLanguage) {
         userLanguagePairPreferences.put(userId, new LanguagePairSelection(sourceLanguage, targetLanguage));
     }
 
-    public void setUserLanguage(int userId, String targetLanguage) {
+    public void setUserLanguage(Long userId, String targetLanguage) {
         userLanguagePreferences.put(userId, new LanguageSelection(targetLanguage));
     }
 
     public void removeUserLanguagePair(Long chatId) {
-        userLanguagePairPreferences.remove(Math.toIntExact(chatId));
+        userLanguagePairPreferences.remove(chatId);
     }
 
     public void removeUserLanguage(Long chatId) {
-        userLanguagePreferences.remove(Math.toIntExact(chatId));
+        userLanguagePreferences.remove(chatId);
     }
 
     public boolean isLanguagePairSet(Long userId) {
-        LanguagePairSelection languagePair = getUserLanguagePair(Math.toIntExact(userId));
+        LanguagePairSelection languagePair = getUserLanguagePair(userId);
         return languagePair != null;
     }
 
     public boolean isLanguageSet(Long userId) {
-        LanguageSelection languageSelection = getUserLanguage(Math.toIntExact(userId));
+        LanguageSelection languageSelection = getUserLanguage(userId);
         return languageSelection != null;
     }
 
-    public void setLastCommandForUser(Integer userId, String command) {
+    public void setLastCommandForUser(Long userId, String command) {
         lastCommandByUser.put(userId, command);
     }
 
-    public String getLastCommandForUser(Integer userId) {
+    public String getLastCommandForUser(Long userId) {
         return lastCommandByUser.get(userId);
     }
-
 }

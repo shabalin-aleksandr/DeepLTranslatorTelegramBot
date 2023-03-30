@@ -67,7 +67,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     }
 
     private void processCallbackQuery(Update update) {
-        Integer userId = Math.toIntExact(update.getCallbackQuery().getFrom().getId());
+        Long userId = update.getCallbackQuery().getFrom().getId();
         String lastCommand = userService.getLastCommandForUser(userId);
         log.warn(lastCommand);
 
@@ -117,7 +117,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                         firstName + "(" + username + ") to the command: " + message);
             }
         } else {
-            Integer userId = Math.toIntExact(update.getMessage().getFrom().getId());
+            Long userId = update.getMessage().getFrom().getId();
             String lastCommand = userService.getLastCommandForUser(userId);
             assert SET_LANGUAGE.getCommandName() != null;
             if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
