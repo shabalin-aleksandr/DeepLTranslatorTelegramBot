@@ -46,7 +46,7 @@ public class AutoTranslateCommand implements CommandInterface {
     private static final String WRITE_MESSAGE = """
             \s
             \s
-            If your translation isn't correct, you can always select specific languages with the command 👉 /setlanguages\s
+            If your translation isn't correct, you can always select specific languages with the command 👉 /set_languages\s
             \s
             🖋🖋🖋
             Now enter a message for translation, if you already wrote it, then just forward it to me again.
@@ -86,12 +86,11 @@ public class AutoTranslateCommand implements CommandInterface {
                 TextResult result = translateMessageServiceInterface.translateAutoDetectedLanguage(messageToTranslate, targetLanguage);
                 if (result != null) {
                     String translatedText = result.getText();
-                    //sendMessageServiceInterface.sendMessage(chatId, TRANSLATE_MESSAGE);
                     sendMessageServiceInterface.sendMessage(chatId, translatedText);
                     log.info("Translated message from the bot: " + translatedText);
                 } else {
                     sendMessageServiceInterface.sendMessage(chatId, "\uD83E\uDD2B An unexpected error occurred during translation. I may not be able to recognise the language. " +
-                            "Try to set up a pair of languages with /setlanguages or write to the administrator if I still don't know your language.");
+                            "Try to set up a pair of languages with /set_languages or write to the administrator if I still don't know your language.");
                 }
             }
         }

@@ -32,7 +32,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
 @Service
-public class SendMessageService implements SendMessageServiceInterface{
+public class SendMessageService implements SendMessageServiceInterface {
 
     private final DeepLTelegramBot deepLBot;
     private final UserService userService;

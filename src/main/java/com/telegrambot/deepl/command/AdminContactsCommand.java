@@ -17,14 +17,18 @@
 package com.telegrambot.deepl.command;
 
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
+import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 public class AdminContactsCommand implements CommandInterface {
 
     private final SendMessageServiceInterface sendMessageServiceInterface;
 
-    public final static String ADMIN_CONTACTS_MESSAGE = """
-            
+    private final static String ADMIN_CONTACTS_MESSAGE_EN = """
+                        
             ✨ In case of any questions, you can contact the Admin of this bot ✨
                         
             ✈️ Telegram: @Doberman786
@@ -33,6 +37,15 @@ public class AdminContactsCommand implements CommandInterface {
                         
             📣 Also, you can send your feedback regarding the use of the bot, this will help make it better.
             """;
+    private final static String ADMIN_CONTACTS_MESSAGE_RU = """
+            ✨ В случае возникновения вопросов, вы можете связаться с администратором этого бота ✨
+
+            ✈️ Telegram: @Doberman786
+            📩 Gmail: dev.aleksandr2000@gmail.com
+            📸 Instagram: https://www.instagram.com/_dbrmn_/
+
+            📣 Также вы можете отправить свой отзыв об использовании бота, это поможет сделать его лучше.
+            """;
 
     public AdminContactsCommand(SendMessageServiceInterface sendMessageServiceInterface) {
         this.sendMessageServiceInterface = sendMessageServiceInterface;
@@ -40,8 +53,32 @@ public class AdminContactsCommand implements CommandInterface {
 
     @Override
     public void execute(Update update) {
-        Long chatId = update.getMessage().getChatId();
+        if (update.hasCallbackQuery()) {
+            try {
+                handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                log.error("Error occurred: " + e.getMessage());
+            }
+        } else if (update.hasMessage()) {
+            Long chatId = update.getMessage().getChatId();
 
-        sendMessageServiceInterface.sendMessage(chatId, ADMIN_CONTACTS_MESSAGE);
+            setTranslateButtonSupport(chatId);
+        }
+    }
+
+    @Override
+    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+        CommandUtility.handleTranslateCallbackQuery(sendMessageServiceInterface,
+                "translate_russian_support",
+                callbackQuery,
+                ADMIN_CONTACTS_MESSAGE_RU);
+    }
+
+    private void setTranslateButtonSupport(Long chatId) {
+        CommandUtility.setTranslateButton(sendMessageServiceInterface,
+                "Перевести на русский язык 🇷🇺",
+                "translate_russian_support",
+                chatId,
+                ADMIN_CONTACTS_MESSAGE_EN);
     }
 }

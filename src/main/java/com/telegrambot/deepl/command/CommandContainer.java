@@ -50,7 +50,7 @@ public class CommandContainer {
                 .put(ADMIN_CONTACTS.getCommandName(), new AdminContactsCommand(sendMessageServiceInterface))
                 .put(DELETE.getCommandName(), new DeleteCommand(sendMessageServiceInterface, userService))
                 .put(ADMIN_SEND_COMMAND.getCommandName(), new SendMessageToAllCommand(userRepository,
-                        sendMessageServiceInterface, config))
+                        sendMessageServiceInterface, config, translateMessageServiceInterface))
                 .build();
 
         unknownCommand = new UnknownCommand(sendMessageServiceInterface);

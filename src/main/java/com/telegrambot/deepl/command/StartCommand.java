@@ -21,6 +21,7 @@ import com.telegrambot.deepl.service.SendMessageServiceInterface;
 import com.telegrambot.deepl.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -36,7 +37,7 @@ public class StartCommand implements CommandInterface {
     private final UserService userService;
     private final DeepLTelegramBot deeplBot;
 
-    public final static String START_MESSAGE = """
+    private final static String START_MESSAGE_EN = """
             🔥Greetings🔥\s
             
             My name is DeepLTranslatorBot, as you may have understood from my name I am designed to translate text from one language to another.\s
@@ -46,6 +47,17 @@ public class StartCommand implements CommandInterface {
             Write /help and you will find out what I can do.
             
             I hope you will enjoy working with me.😇
+            """;
+    private final static String START_MESSAGE_RU = """
+            🔥Приветствую🔥\s
+            
+            Меня зовут DeepLTranslatorBot, как вы уже поняли из моего имени, я создан для перевода текста с одного языка на другой.\s
+            
+            👇👇👇
+            
+            Напишите /help и вы узнаете, что я могу сделать.
+            
+            Надеюсь, вам понравится работать со мной.😇
             """;
 
     public StartCommand(SendMessageServiceInterface sendMessageServiceInterface,
@@ -58,11 +70,35 @@ public class StartCommand implements CommandInterface {
 
     @Override
     public void execute(Update update) {
-        Long chatId = update.getMessage().getChatId();
+        if (update.hasCallbackQuery()) {
+            try {
+                handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                log.error("Error occurred: " + e.getMessage());
+            }
+        } else if (update.hasMessage()) {
+            Long chatId = update.getMessage().getChatId();
 
-        userService.registerUser(update.getMessage());
-        setupBotMenu();
-        sendMessageServiceInterface.sendMessage(chatId, START_MESSAGE);
+            userService.registerUser(update.getMessage());
+            setupBotMenu();
+            setTranslateButtonStart(chatId);
+        }
+    }
+
+    @Override
+    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+        CommandUtility.handleTranslateCallbackQuery(sendMessageServiceInterface,
+                "translate_russian_start",
+                callbackQuery,
+                START_MESSAGE_RU);
+    }
+
+    private void setTranslateButtonStart(Long chatId) {
+        CommandUtility.setTranslateButton(sendMessageServiceInterface,
+                "Перевести на русский язык 🇷🇺",
+                "translate_russian_start",
+                chatId,
+                START_MESSAGE_EN);
     }
 
     public void setupBotMenu() {
@@ -70,10 +106,10 @@ public class StartCommand implements CommandInterface {
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
         botCommands.add(new BotCommand("/translate", "Translate your message with auto-detection"));
-        botCommands.add(new BotCommand("/setlanguages", "Language pair selection"));
+        botCommands.add(new BotCommand("/set_languages", "Language pair selection"));
         botCommands.add(new BotCommand("/languages", "List of available languages"));
         botCommands.add(new BotCommand("/support", "Admin contacts"));
-        botCommands.add(new BotCommand("/deletemydata", "Delete your account"));
+        botCommands.add(new BotCommand("/delete_my_data", "Delete your account"));
 
         try {
             deeplBot.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));

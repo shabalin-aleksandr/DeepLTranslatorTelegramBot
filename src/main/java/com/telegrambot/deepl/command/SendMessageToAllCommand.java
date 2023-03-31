@@ -16,12 +16,18 @@
 
 package com.telegrambot.deepl.command;
 
+import com.deepl.api.TextResult;
 import com.telegrambot.deepl.config.BotConfig;
 import com.telegrambot.deepl.repository.UserRepository;
 import com.telegrambot.deepl.repository.UserRepositoryInterface;
 import com.telegrambot.deepl.service.SendMessageServiceInterface;
+import com.telegrambot.deepl.service.TranslateMessageServiceInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Objects;
 
@@ -32,13 +38,15 @@ public class SendMessageToAllCommand implements CommandInterface {
     private final SendMessageServiceInterface sendMessageServiceInterface;
     private final BotConfig config;
     private final UnknownCommand unknownCommand;
+    private final TranslateMessageServiceInterface translateMessageServiceInterface;
 
     public SendMessageToAllCommand(UserRepositoryInterface userRepository,
-                                   SendMessageServiceInterface sendMessageServiceInterface, BotConfig config) {
+                                   SendMessageServiceInterface sendMessageServiceInterface, BotConfig config, TranslateMessageServiceInterface translateMessageServiceInterface) {
         this.userRepository = userRepository;
         this.sendMessageServiceInterface = sendMessageServiceInterface;
         this.config = config;
         this.unknownCommand = new UnknownCommand(sendMessageServiceInterface);
+        this.translateMessageServiceInterface = translateMessageServiceInterface;
     }
 
     @Override
@@ -52,13 +60,53 @@ public class SendMessageToAllCommand implements CommandInterface {
             var users = userRepository.findAll();
 
             for (UserRepository user : users) {
-                sendMessageServiceInterface.sendMessage(user.getChatId(), textToSend);
+                setTranslateButtonAdminMessage(user.getChatId(), textToSend);
             }
             log.info("Admin: " + username + " with id: " + chatId + " using an Admin command: /send");
         } else {
             unknownCommand.execute(update);
             log.info("User: " +username + " with id: " + chatId + " was trying to use Admin command");
         }
+    }
+
+    @Override
+    public void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
+        String callbackData = callbackQuery.getData();
+
+        if (callbackData.equals("translate_russian_admin")) {
+            String originalMessage = callbackQuery.getMessage().getText();
+            TextResult translatedResult = translateToRussian(originalMessage);
+
+            if (translatedResult != null) {
+                String translatedMessage = translatedResult.getText();
+                EditMessageText editMessageText = new EditMessageText();
+                editMessageText.setChatId(callbackQuery.getMessage().getChatId().toString());
+                editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
+                editMessageText.setText(translatedMessage);
+
+                sendMessageServiceInterface.editMessage(editMessageText);
+
+                AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+                answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
+
+                sendMessageServiceInterface.answerCallbackQuery(answerCallbackQuery);
+            } else {
+                log.error("Error translating admin message");
+            }
+        }
+    }
+
+
+    private void setTranslateButtonAdminMessage(Long chatId, String textToSendEn) {
+        CommandUtility.setTranslateButton(sendMessageServiceInterface,
+                "Перевести на русский язык 🇷🇺",
+                "translate_russian_admin",
+                chatId,
+                textToSendEn);
+    }
+
+    private TextResult translateToRussian(String message) {
+        return translateMessageServiceInterface.translateAutoDetectedLanguage(message, "ru");
     }
 }
 

@@ -71,7 +71,7 @@ public class TranslateCommand implements CommandInterface {
             Long chatId = update.getMessage().getChatId();
             String messageToTranslate = update.getMessage().getText();
 
-            if(!userService.isLanguagePairSet(chatId) || "/setlanguages".equalsIgnoreCase(messageToTranslate)) {
+            if(!userService.isLanguagePairSet(chatId) || "/set_languages".equalsIgnoreCase(messageToTranslate)) {
                 Integer messageId = update.getMessage().getMessageId();
                 sendLanguagePairSelectionMessage(chatId, messageId);
             } else {

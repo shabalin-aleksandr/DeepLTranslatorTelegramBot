@@ -20,10 +20,10 @@ public enum CommandName {
     START("/start"),
     HELP("/help"),
     AUTO_TRANSLATE("/translate"),
-    SET_LANGUAGE("/setlanguages"),
+    SET_LANGUAGE("/set_languages"),
     LANGUAGES("/languages"),
     ADMIN_CONTACTS("/support"),
-    DELETE("/deletemydata"),
+    DELETE("/delete_my_data"),
     ADMIN_SEND_COMMAND("/send");
 
     private final String commandName;

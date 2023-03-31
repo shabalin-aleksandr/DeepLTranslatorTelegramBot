@@ -32,8 +32,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static com.telegrambot.deepl.command.CommandName.SET_LANGUAGE;
-import static com.telegrambot.deepl.command.CommandName.AUTO_TRANSLATE;
+import static com.telegrambot.deepl.command.CommandName.*;
 
 @Slf4j
 @Component
@@ -52,7 +51,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                             UserRepositoryInterface userRepositoryInterface) {
         this.userService = userService;
         this.config = config;
-        this.commandContainer = new CommandContainer( new SendMessageService(this, userService),
+        this.commandContainer = new CommandContainer(new SendMessageService(this, userService),
                 new TranslateMessageService(this),
                 userService, userRepositoryInterface, config, this);
     }
@@ -61,28 +60,51 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
             processCallbackQuery(update);
-        } else if (update.hasMessage() && update.getMessage().hasText()) {
-            processMessageUpdate(update);
+        } else if (update.hasMessage()) {
+            if (update.getMessage().hasText()) {
+                processMessageUpdate(update);
+            } else if (update.getMessage().isCommand()) {
+                try {
+                    commandContainer.findCommand(update.getMessage().getText()).execute(update);
+                } catch (InterruptedException e) {
+                    log.error("Error executing command: " + update.getMessage().getText(), e);
+                }
+            }
         }
     }
 
     private void processCallbackQuery(Update update) {
-        Long userId = update.getCallbackQuery().getFrom().getId();
-        String lastCommand = userService.getLastCommandForUser(userId);
-        log.warn(lastCommand);
+        String callbackData = update.getCallbackQuery().getData();
+        String command = switch (callbackData) {
+            case "translate_russian_start" -> START.getCommandName();
+            case "translate_russian_help" -> HELP.getCommandName();
+            case "translate_russian_lang" -> LANGUAGES.getCommandName();
+            case "translate_russian_support" -> ADMIN_CONTACTS.getCommandName();
+            case "translate_russian_delete" -> DELETE.getCommandName();
+            case "translate_russian_admin" -> ADMIN_SEND_COMMAND.getCommandName();
+            default -> null;
+        };
 
-        if (AUTO_TRANSLATE.getCommandName().equals(lastCommand)) {
-            try {
-                commandContainer.findCommand(AUTO_TRANSLATE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
-            } catch (TelegramApiException e) {
-                log.error("Error handling callback query: ", e);
+        if (command != null) {
+            handleCallbackWithCommand(update, command);
+        } else {
+            Long userId = update.getCallbackQuery().getFrom().getId();
+            String lastCommand = userService.getLastCommandForUser(userId);
+            log.warn(lastCommand);
+
+            if (AUTO_TRANSLATE.getCommandName().equals(lastCommand)) {
+                handleCallbackWithCommand(update, AUTO_TRANSLATE.getCommandName());
+            } else if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
+                handleCallbackWithCommand(update, SET_LANGUAGE.getCommandName());
             }
-        } else if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
-            try {
-                commandContainer.findCommand(SET_LANGUAGE.getCommandName()).handleCallbackQuery(update.getCallbackQuery());
-            } catch (TelegramApiException e) {
-                log.error("Error handling callback query: ", e);
-            }
+        }
+    }
+
+    private void handleCallbackWithCommand(Update update, String command) {
+        try {
+            commandContainer.findCommand(command).handleCallbackQuery(update.getCallbackQuery());
+        } catch (TelegramApiException e) {
+            log.error("Error handling callback query: ", e);
         }
     }
 
@@ -91,15 +113,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         String message = update.getMessage().getText().trim();
         String username = update.getMessage().getFrom().getUserName();
         String firstName = update.getMessage().getChat().getFirstName();
-        String commandId = null;
-
-        if (message.startsWith(COMMAND_START)) {
-            commandId = message.split(" ")[0].toLowerCase();
-        } else if (message.equalsIgnoreCase("/translate")) {
-            commandId = AUTO_TRANSLATE.getCommandName();
-        } else if (message.equalsIgnoreCase("/setlanguages")) {
-            commandId = SET_LANGUAGE.getCommandName();
-        }
+        String commandId = getCommandIdFromMessage(message);
 
         if (commandId != null) {
             boolean userExists = userService.isUserExists(chatId);
@@ -108,30 +122,49 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
                 SendMessageServiceInterface sendMessageServiceInterface = applicationContext.getBean(SendMessageService.class);
                 sendMessageServiceInterface.sendMessage(chatId, "Please use /start to begin using the bot again.");
             } else {
-                try {
-                    commandContainer.findCommand(commandId).execute(update);
-                } catch (InterruptedException e) {
-                    log.error("Error executing command: " + commandId, e);
-                }
-                log.info("This was a response to the user: " +
-                        firstName + "(" + username + ") to the command: " + message);
+                executeCommandAndUpdateLog(update, commandId, firstName, username, message);
             }
         } else {
-            Long userId = update.getMessage().getFrom().getId();
-            String lastCommand = userService.getLastCommandForUser(userId);
-            assert SET_LANGUAGE.getCommandName() != null;
-            if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
-                try {
-                    commandContainer.findCommand(SET_LANGUAGE.getCommandName()).execute(update);
-                } catch (InterruptedException e) {
-                    log.error("Error executing SetLanguageCommand: ", e);
-                }
-            } else {
-                try {
-                    commandContainer.findCommand(AUTO_TRANSLATE.getCommandName()).execute(update);
-                } catch (InterruptedException e) {
-                    log.error("Error executing TranslateCommand with auto-detection: ", e);
-                }
+            handleNonCommandMessage(update);
+        }
+    }
+
+    private String getCommandIdFromMessage(String message) {
+        if (message.startsWith(COMMAND_START)) {
+            return message.split(" ")[0].toLowerCase();
+        } else if (message.equalsIgnoreCase("/translate")) {
+            return AUTO_TRANSLATE.getCommandName();
+        } else if (message.equalsIgnoreCase("/set_languages")) {
+            return SET_LANGUAGE.getCommandName();
+        }
+        return null;
+    }
+
+    private void executeCommandAndUpdateLog(Update update, String commandId, String firstName, String username, String message) {
+        try {
+            commandContainer.findCommand(commandId).execute(update);
+        } catch (InterruptedException e) {
+            log.error("Error executing command: " + commandId, e);
+        }
+        log.info("This was a response to the user: " +
+                firstName + "(" + username + ") to the command: " + message);
+    }
+
+    private void handleNonCommandMessage(Update update) {
+        Long userId = update.getMessage().getFrom().getId();
+        String lastCommand = userService.getLastCommandForUser(userId);
+        assert SET_LANGUAGE.getCommandName() != null;
+        if (SET_LANGUAGE.getCommandName().equals(lastCommand)) {
+            try {
+                commandContainer.findCommand(SET_LANGUAGE.getCommandName()).execute(update);
+            } catch (InterruptedException e) {
+                log.error("Error executing SetLanguageCommand: ", e);
+            }
+        } else {
+            try {
+                commandContainer.findCommand(AUTO_TRANSLATE.getCommandName()).execute(update);
+            } catch (InterruptedException e) {
+                log.error("Error executing TranslateCommand with auto-detection: ", e);
             }
         }
     }
