@@ -29,9 +29,6 @@ public class TranslateMessageService implements TranslateMessageServiceInterface
 
     Translator translator;
 
-    public TranslateMessageService(DeepLTelegramBot deepLBot) {
-    }
-
     @Override
     public TextResult translateMessageWithSourceLanguage(String message, String sourceLanguage, String targetLanguage) {
         translator = new Translator(authKey);

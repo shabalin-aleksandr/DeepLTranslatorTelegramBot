@@ -43,6 +43,8 @@ public class UserService {
     private final Map<Long, LanguagePairSelection> userLanguagePairPreferences = new ConcurrentHashMap<>();
     private final Map<Long, LanguageSelection> userLanguagePreferences = new ConcurrentHashMap<>();
     private final Map<Long, String> lastCommandByUser = new ConcurrentHashMap<>();
+    private final Map<Long, UserLanguageData> userLanguageDataMap = new ConcurrentHashMap<>();
+
 
     public void registerUser(Message msg) {
         if (userRepositoryInterface.findById(msg.getChatId()).isEmpty()) {
@@ -120,4 +122,45 @@ public class UserService {
     public String getLastCommandForUser(Long userId) {
         return lastCommandByUser.get(userId);
     }
+
+    private static class UserLanguageData {
+        private boolean selectedSourceLanguage;
+        private String sourceLanguage;
+
+        public boolean isSelectedSourceLanguage() {
+            return selectedSourceLanguage;
+        }
+
+        public void setSelectedSourceLanguage(boolean selectedSourceLanguage) {
+            this.selectedSourceLanguage = selectedSourceLanguage;
+        }
+
+        public String getSourceLanguage() {
+            return sourceLanguage;
+        }
+
+        public void setSourceLanguage(String sourceLanguage) {
+            this.sourceLanguage = sourceLanguage;
+        }
+    }
+
+    public boolean hasSelectedSourceLanguage(Long userId) {
+        return userLanguageDataMap.containsKey(userId) && userLanguageDataMap.get(userId).isSelectedSourceLanguage();
+    }
+
+    public void setSelectedSourceLanguage(Long userId, boolean isSelected) {
+        UserLanguageData userLanguageData = userLanguageDataMap.computeIfAbsent(userId, id -> new UserLanguageData());
+        userLanguageData.setSelectedSourceLanguage(isSelected);
+    }
+
+    public String getUserSourceLanguage(Long userId) {
+        return userLanguageDataMap.containsKey(userId) ? userLanguageDataMap.get(userId).getSourceLanguage() : null;
+    }
+
+    public void setUserSourceLanguage(Long userId, String sourceLanguage) {
+        UserLanguageData userLanguageData = userLanguageDataMap.computeIfAbsent(userId, id -> new UserLanguageData());
+        userLanguageData.setSourceLanguage(sourceLanguage);
+    }
+
+
 }

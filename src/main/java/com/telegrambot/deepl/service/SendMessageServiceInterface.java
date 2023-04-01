@@ -18,6 +18,7 @@ package com.telegrambot.deepl.service;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -28,5 +29,6 @@ public interface SendMessageServiceInterface {
     void sendMessage(Long chatId, List<String> message);
     void sendMessage(SendMessage message) throws InterruptedException, TelegramApiException;
     void editMessage(EditMessageText editMessageText) throws TelegramApiException;
+    void deleteMessage(DeleteMessage deleteMessage) throws TelegramApiException;
     void answerCallbackQuery(AnswerCallbackQuery answerCallbackQuery) throws TelegramApiException;
 }

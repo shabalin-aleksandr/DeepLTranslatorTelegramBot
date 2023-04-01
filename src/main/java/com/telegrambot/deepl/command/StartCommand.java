@@ -106,7 +106,7 @@ public class StartCommand implements CommandInterface {
         botCommands.add(new BotCommand("/start", "Get a welcome message"));
         botCommands.add(new BotCommand("/help", "Info about commands"));
         botCommands.add(new BotCommand("/translate", "Translate your message with auto-detection"));
-        botCommands.add(new BotCommand("/set_languages", "Language pair selection"));
+        botCommands.add(new BotCommand("/set_languages", "Language selection"));
         botCommands.add(new BotCommand("/languages", "List of available languages"));
         botCommands.add(new BotCommand("/support", "Admin contacts"));
         botCommands.add(new BotCommand("/delete_my_data", "Delete your account"));

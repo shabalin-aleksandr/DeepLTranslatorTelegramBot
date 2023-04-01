@@ -52,7 +52,7 @@ public class DeepLTelegramBot extends TelegramLongPollingBot {
         this.userService = userService;
         this.config = config;
         this.commandContainer = new CommandContainer(new SendMessageService(this, userService),
-                new TranslateMessageService(this),
+                new TranslateMessageService(),
                 userService, userRepositoryInterface, config, this);
     }
 

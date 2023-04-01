@@ -38,7 +38,7 @@ public class HelpCommand implements CommandInterface {
             
             🌐 /translate - This command will automatically detect the language of the message you have sent and translate it into the language of your choice
             
-            👀 /set_languages - The command displays a menu for selecting a pair of languages for translation
+            👀 /set_languages - The command displays a menu of languages for translation
                         
             📙 /languages - To see a list of available languages that the bot understands
             
@@ -58,7 +58,7 @@ public class HelpCommand implements CommandInterface {
             
             🌐 /translate - Эта команда автоматически определит язык отправленного вами сообщения и переведет его на выбранный вами язык
                         
-            👀 /set_languages - Команда отображает меню для выбора пары языков для перевода
+            👀 /set_languages - Команда отображает меню выбора языков для перевода
             
             📙 /languages - Посмотреть список доступных языков, которые понимает бот
             
