@@ -55,13 +55,6 @@ You should run command:
 ```
 docker-compose up
 ```
-# Cloud Server
-This bot is running on the [AWS](https://aws.amazon.com), a leading cloud services provider that offers a wide range of scalable and reliable solutions for deploying applications.
-
-- RDS (Relational Database Service) - A fully managed and scalable relational database service that automates time-consuming administration tasks such as hardware provisioning, database setup, patching, and backups. RDS is used to host the PostgreSQL database for storing registered users.
-- EC2 (Elastic Compute Cloud) - A flexible and resizable compute capacity in the cloud that allows you to easily scale your application based on demand. EC2 instances are used to host the Spring Boot application, providing the necessary resources for efficient performance and high availability.
-- VPC (Virtual Private Cloud) - A virtual network that provides a secure and isolated environment for your AWS resources. The VPC allows you to control and customize your network configuration, ensuring that your bot, RDS, and EC2 instances are protected from unauthorized access and potential security threats.
-
 # Technology Stack
 - Maven - Project build system.
 - Spring Boot - As a skeleton framework.
